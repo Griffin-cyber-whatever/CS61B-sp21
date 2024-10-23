@@ -85,6 +85,7 @@ public class Board implements Iterable<Tile> {
      *
      * Returns whether or not this move is a merge.
      * */
+    // non static method need anothe object merge object with given coordinate will be assigned to null and argument object to argument column place
     public boolean move(int col, int row, Tile tile) {
         int pcol = viewPerspective.col(col, row, size()),
                 prow = viewPerspective.row(col, row, size());

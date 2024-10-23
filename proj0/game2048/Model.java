@@ -106,6 +106,9 @@ public class Model extends Observable {
      *    value, then the leading two tiles in the direction of motion merge,
      *    and the trailing tile does not.
      * */
+    // it will modify the board instance
+    // All movements of tiles on the board must be completed using the move method provided by the Board class
+    // my aproach  -> divide board into 4 arrags with 4 elements based on the side use divide() -> calculate and return it use changeArray() -> call another method to sort it back
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
@@ -113,12 +116,42 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
-
+        board.setViewingPerspective(side);
+        for (int col = 0; col < board.size(); col++) {
+            for (int row = board.size() - 1; row >= 0; row--){
+                Tile current = board.tile(col, row);
+                int nextRow = nextNonNullTileRow(col, row);
+                if (nextRow == -1) {
+                    break;
+                }
+                Tile nextTile = board.tile(col, nextRow);
+                if (current == null || current.value() == nextTile.value()) {
+                    changed = true;
+                    if (board.move(col, row, nextTile)) {
+                        score += 2 * nextTile.value();
+                    } else {
+                        row++;
+                    }
+                }
+            }
+        }
+        board.setViewingPerspective(Side.NORTH);
         checkGameOver();
         if (changed) {
             setChanged();
         }
         return changed;
+    }
+
+    // find previous tile in the same column
+    // if no previous or previous is null return the top element of this column
+    private int nextNonNullTileRow(int col, int row) {
+        for (int pos = row - 1; pos >= 0; pos--) {
+            if (board.tile(col, pos) != null) {
+                return pos;
+            }
+        }
+        return -1;
     }
 
     /** Checks if the game is over and sets the gameOver variable
@@ -138,6 +171,14 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
+        int size = b.size();
+        for(int i=0; i < size; i++){
+            for(int j = 0; j< size; j++){
+                if(b.tile(i,j) == null){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -148,6 +189,14 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
+        int size = b.size();
+        for(int i=0; i < size; i++){
+            for(int j = 0; j< size; j++){
+                if(b.tile(i,j) != null && b.tile(i,j).value() >= Model.MAX_PIECE){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -159,9 +208,40 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        // check for empty space first
+        if (emptySpaceExists(b)) {
+            return true;
+        }
+        int size = b.size();
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (adjacent(b, i, j, 1)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
+    public static boolean adjacent(Board b, int row, int col, int neighbour) {
+        for(int i = row - neighbour; i <= i+neighbour; i++){
+            for(int j = col - neighbour; j <= j+neighbour; j++){
+                if(i == row && j == col){continue;}
+                if(positionvalidator(b,i,j)){
+                    if(b.tile(i,j).value() == b.tile(row,col).value()){return true;}
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean positionvalidator(Board b, int row, int col) {
+        int size = b.size();
+        if (0 <= row && row < size && 0 <= col && col < size){
+            return true;
+        }
+        return false;
+    }
 
     @Override
      /** Returns the model as a string, used for debugging. */
