@@ -202,14 +202,12 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
-        // check for empty space first
-        if (emptySpaceExists(b)) {
-            return true;
-        }
-        int size = b.size();
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (adjacent(b, i, j)) {
+        for (int row = 0; row < b.size(); row++) {
+            for (int col = 0; col < b.size(); col++) {
+                if (b.tile(col, row) == null) {
+                    return true;
+                }
+                if (checkTileMoveExists(b, col, row)) {
                     return true;
                 }
             }
@@ -217,19 +215,32 @@ public class Model extends Observable {
         return false;
     }
 
-    public static boolean adjacent(Board b, int row, int col) {
-        for(int i = row - 1; i <= row+1; i++){
-            for(int j = col - 1; j <= col+1; j++){
-                if(i == row && j == col){continue;}
-                if(positionvalidator(b,i,j)){
-                    if(b.tile(j,i).value() == b.tile(col,row).value()){return true;}
-                }
+    private static boolean checkTileMoveExists(Board b, int col, int row) {
+        Tile tile = b.tile(col, row);
+        if (checkTileValid(b, col + 1, row)) {
+            if (tile.value() == b.tile(col + 1, row).value()) {
+                return true;
+            }
+        }
+        if (checkTileValid(b, col - 1, row)) {
+            if (tile.value() == b.tile(col - 1, row).value()) {
+                return true;
+            }
+        }
+        if (checkTileValid(b, col, row + 1)) {
+            if (tile.value() == b.tile(col, row + 1).value()) {
+                return true;
+            }
+        }
+        if (checkTileValid(b, col, row - 1)) {
+            if (tile.value() == b.tile(col, row - 1).value()) {
+                return true;
             }
         }
         return false;
     }
 
-    public static boolean positionvalidator(Board b, int row, int col) {
+    public static boolean checkTileValid(Board b, int row, int col) {
         int size = b.size();
         if (0 <= row && row < size && 0 <= col && col < size && b.tile(col,row) != null) {
             return true;
