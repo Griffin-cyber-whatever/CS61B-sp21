@@ -171,12 +171,9 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
-        int size = b.size();
-        for(int i=0; i < size; i++){
-            for(int j = 0; j< size; j++){
-                if(b.tile(i,j) == null){
-                    return true;
-                }
+        for (Tile tile : b) {
+            if (tile == null) {
+                return true;
             }
         }
         return false;
@@ -189,12 +186,9 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
-        int size = b.size();
-        for(int i=0; i < size; i++){
-            for(int j = 0; j< size; j++){
-                if(b.tile(i,j) != null && b.tile(i,j).value() >= Model.MAX_PIECE){
-                    return true;
-                }
+        for (Tile tile : b) {
+            if (tile != null && tile.value() == MAX_PIECE) {
+                return true;
             }
         }
         return false;
@@ -215,7 +209,7 @@ public class Model extends Observable {
         int size = b.size();
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                if (adjacent(b, i, j, 1)) {
+                if (adjacent(b, i, j)) {
                     return true;
                 }
             }
@@ -223,12 +217,12 @@ public class Model extends Observable {
         return false;
     }
 
-    public static boolean adjacent(Board b, int row, int col, int neighbour) {
-        for(int i = row - neighbour; i <= i+neighbour; i++){
-            for(int j = col - neighbour; j <= j+neighbour; j++){
+    public static boolean adjacent(Board b, int row, int col) {
+        for(int i = row - 1; i <= row+1; i++){
+            for(int j = col - 1; j <= col+1; j++){
                 if(i == row && j == col){continue;}
                 if(positionvalidator(b,i,j)){
-                    if(b.tile(i,j).value() == b.tile(row,col).value()){return true;}
+                    if(b.tile(j,i).value() == b.tile(col,row).value()){return true;}
                 }
             }
         }
@@ -237,7 +231,7 @@ public class Model extends Observable {
 
     public static boolean positionvalidator(Board b, int row, int col) {
         int size = b.size();
-        if (0 <= row && row < size && 0 <= col && col < size){
+        if (0 <= row && row < size && 0 <= col && col < size && b.tile(col,row) != null) {
             return true;
         }
         return false;
