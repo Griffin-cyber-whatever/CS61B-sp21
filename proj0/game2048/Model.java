@@ -240,7 +240,7 @@ public class Model extends Observable {
         return false;
     }
 
-    public static boolean checkTileValid(Board b, int row, int col) {
+    public static boolean checkTileValid(Board b, int col, int row) {
         int size = b.size();
         if (0 <= row && row < size && 0 <= col && col < size && b.tile(col,row) != null) {
             return true;
