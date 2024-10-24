@@ -32,13 +32,13 @@ public class SquarePrimesTest {
     public void testSquarePrimes() {
         // only one element
         IntList lst1 = IntList.of(17);
-        boolean changed1 = IntListExercises.squarePrimes(lst1,false);
+        boolean changed1 = IntListExercises.squarePrimes(lst1);
         assertEquals("289", lst1.toString());
         assertTrue(changed1);
 
         // need to change multiple primes in a roll
         IntList lst2 = IntList.of(2,2,3);
-        boolean changed2 = IntListExercises.squarePrimes(lst2,false);
+        boolean changed2 = IntListExercises.squarePrimes(lst2);
         assertEquals("4 -> 4 -> 9", lst2.toString());
         assertTrue(changed2);
     }

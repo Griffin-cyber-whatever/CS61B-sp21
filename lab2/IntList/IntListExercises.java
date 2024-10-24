@@ -80,4 +80,8 @@ public class IntListExercises {
         // traverse through entire list do not need to short-circuit it
         return squarePrimes(lst.rest,squared);
     }
+
+    public static boolean squarePrimes(IntList lst) {
+        return squarePrimes(lst, false);
+    }
 }
