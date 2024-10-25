@@ -134,6 +134,10 @@ public class ArrayDeque<T> {
         return array[indexvalidator(index)];
     }
 
+    public int size(){
+        return size;
+    }
+    
     public boolean equals(Object o){
         if (!(o instanceof LinkedListDeque)){
             return false;
