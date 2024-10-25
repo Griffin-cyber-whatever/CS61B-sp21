@@ -19,48 +19,53 @@ public class ArrayDeque<T> {
         next = 0;
     }
 
-    public ArrayDeque(T[] array) {
-        size = array.length;
-        T[] newarray = (T[]) new Object[size+1];
-        System.arraycopy(array, 0, newarray, 0, size);
-        this.array = array;
-        capacity = array.length;
-        start = capacity-1;
-        next = capacity-1;
-    }
+//    public ArrayDeque(T[] array) {
+//        size = array.length;
+//        T[] newarray = (T[]) new Object[size+1];
+//        System.arraycopy(array, 0, newarray, 0, size);
+//        this.array = array;
+//        capacity = array.length;
+//        start = capacity-1;
+//        next = capacity-1;
+//    }
 
     /* change the size of array*/
     public void resize(int newCapacity) {
-        if (newCapacity < capacity) {
-            return;
-        }
         T[] newArray = (T[]) new Object[newCapacity];
-        System.arraycopy(array, 0, newArray, 0, next);
-        int t = newCapacity-(size - next);
-        for(int i = 0; i < size-next; i++) {
-            newArray[t+i] = array[next+i];
+
+        // Calculate where the elements are in the current array and copy them over
+        int current = (start + 1) % capacity; // Start from the first actual element
+        for (int i = 0; i < size; i++) {
+            newArray[i] = array[current];
+            current = (current + 1) % capacity; // Move circularly within bounds
         }
+
+        // Update references and variables to match the new array
         array = newArray;
-        start = newCapacity-(size - next);
+        capacity = newCapacity;
+        start = newCapacity - 1; // Start points to one position before the first element
+        next = size; // Next points to the first empty slot after the last element
     }
+
+
 
     /*Adds an item of type T to the front of the deque. You can assume that item is never null.*/
     public void addFirst(T item){
         if(size == capacity){
-            resize(capacity+1);
+            resize(capacity*2);
         }
         array[start] = item;
-        start--;
+        start = (start - 1 + capacity) % capacity;
         size++;
     }
 
     /*Adds an item of type T to the back of the deque. You can assume that item is never null.*/
     public void addLast(T item){
         if(size == capacity){
-            resize(capacity+1);
+            resize(capacity*2);
         }
         array[next] = item;
-        next++;
+        next = (next + 1) % capacity; // Wrap around if necessary
         size++;
     }
 
@@ -101,11 +106,12 @@ public class ArrayDeque<T> {
         if(size == 0){
             return null;
         }
-        T temp = array[start+1];
-        array[start+1] = null;
-        start++;
-        start = start % capacity;
-        size++;
+        int a = start+1;
+        a = a % capacity;
+        T temp = array[a];
+        array[a] = null;
+        start = a;
+        size--;
         memoryEfficiency();
         return temp;
     }
@@ -114,10 +120,12 @@ public class ArrayDeque<T> {
         if(size == 0){
             return null;
         }
-        T temp = array[next-1];
-        array[next-1] = null;
-        next--;
-        size++;
+        int a = next-1;
+        a = a % capacity;
+        T temp = array[a];
+        array[a] = null;
+        next = a;
+        size--;
         memoryEfficiency();
         return temp;
     }

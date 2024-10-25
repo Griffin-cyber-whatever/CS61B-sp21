@@ -35,6 +35,7 @@ public class ArrayDequeTest{
         assertTrue(ad2.indexvalidator(1) == 4);
     }
 
+    @Test
     public void getTest(){
         ArrayDeque<Integer> ad1 = new ArrayDeque<Integer>();
         ad1.addFirst(1);
@@ -45,6 +46,7 @@ public class ArrayDequeTest{
         assertTrue(ad1.get(2) == 3);
     }
 
+    @Test
     public void addLastTest(){
         ArrayDeque<Integer> ad1 = new ArrayDeque<Integer>();
         ad1.addLast(1);
@@ -56,6 +58,7 @@ public class ArrayDequeTest{
         assertTrue(ad1.indexvalidator(0) == 0);
     }
 
+    @Test
     public void removeFirstTest(){
         ArrayDeque<Integer> ad1 = new ArrayDeque<Integer>();
         ad1.addLast(1);
@@ -75,16 +78,18 @@ public class ArrayDequeTest{
         assertTrue(ad1.removeFirst() == 3);
     }
 
+    @Test
     public void removeLastTest(){
         ArrayDeque<Integer> ad1 = new ArrayDeque<Integer>();
         ad1.addLast(1);
         ad1.addLast(2);
         ad1.addLast(3);
-        assertTrue(ad1.removeFirst() == 3);
-        assertTrue(ad1.removeFirst() == 2);
-        assertTrue(ad1.removeFirst() == 1);
+        assertTrue(ad1.removeLast() == 3);
+        assertTrue(ad1.removeLast() == 2);
+        assertTrue(ad1.removeLast() == 1);
     }
 
+    @Test
     public void mutateFirstTest(){
         ArrayDeque<Integer> ad1 = new ArrayDeque<Integer>();
         ad1.addLast(1);
