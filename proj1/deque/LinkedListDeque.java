@@ -1,6 +1,6 @@
 package deque;
 
-public class LinkedListDeque<T>{
+public class LinkedListDeque<T> implements Deque<T> {
 
     private class Node <T>{
         public T item;
@@ -45,6 +45,7 @@ public class LinkedListDeque<T>{
     }
 
     /* Adds an item of type T to the front of the deque. You can assume that item is never null. */
+    @Override
     public void addFirst(T item){
         Node<T> tmp = new Node<>(item);
         tmp.next = sentinel.next;
@@ -55,6 +56,7 @@ public class LinkedListDeque<T>{
     }
 
     /* append a new node at the end of current list which took constant time*/
+    @Override
     public void addLast(T item){
         Node<T> tmp = new Node<>(item);
         tmp.prev = sentinel.prev;
@@ -64,25 +66,26 @@ public class LinkedListDeque<T>{
         this.size++;
     }
 
-    /* Returns true if deque is empty, false otherwise. */
-    public boolean isEmpty(){
-        return this.size == 0;
-    }
-
     /* Returns the number of items in the deque. */
+    @Override
     public int size(){
         return this.size;
     }
 
     /*  Prints the items in the deque from first to last, separated by a space. Once all the items have been printed, print out a new line. */
+    @Override
     public void printDeque(){
-        for(int i = 0; i < size-1; i++){
-            System.out.print(get(i).item + " ");
+        if(size == 0){
+            return ;
         }
-        System.out.println(get(size-1).item);
+        for(int i = 0; i < size-1; i++){
+            System.out.print(get(i) + " ");
+        }
+        System.out.println(get(size-1));
     }
 
     /*  Removes and returns the item at the front of the deque. If no such item exists, returns null. */
+    @Override
     public T removeFirst(){
         if (this.size <= 0){
             return null;
@@ -95,6 +98,7 @@ public class LinkedListDeque<T>{
     }
 
     /* Removes and returns the item at the back of the deque. If no such item exists, returns null. */
+    @Override
     public T removeLast(){
         if (this.size <= 0){
             return null;
@@ -107,7 +111,8 @@ public class LinkedListDeque<T>{
     }
 
     /* return the ith element of the total list*/
-    public Node<T> get(int index){
+    @Override
+    public T get(int index){
         if (index < 0 || index >= this.size){
             return null;
         }
@@ -121,12 +126,12 @@ public class LinkedListDeque<T>{
             count++;
             tmp = tmp.next;
         }
-        return tmp;
+        return tmp.item;
     }
 
     /* implement the same effect as previous get method instead of using the recursive version of it*/
-    public Node<T> getRecursive(int index){
-        return getRecursive(index, sentinel.next);
+    public T getRecursive(int index){
+        return getRecursive(index, sentinel.next).item;
     }
 
     public Node<T> getRecursive(int index, Node<T> tmp){
@@ -139,7 +144,7 @@ public class LinkedListDeque<T>{
         return getRecursive(index-1, sentinel.next);
     }
 
-    /* Returns whether or not the parameter o is equal to the Deque. */
+    /* Returns whether the parameter o is equal to the Deque. */
     public boolean equals(Object o){
         if (!(o instanceof LinkedListDeque)){
             return false;
@@ -155,9 +160,5 @@ public class LinkedListDeque<T>{
         }
         return true;
     }
-
-//    public interface Iterator<T> {
-//
-//    }
 
 }

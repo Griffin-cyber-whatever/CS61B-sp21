@@ -1,6 +1,6 @@
 package deque;
 
-public class ArrayDeque<T> {
+public class ArrayDeque<T> implements Deque<T>{
     /* size will keep tracking on how many elements are we actually using
     *  capacity will keep tracking on the actual capacity of the array*/
     int size;
@@ -9,8 +9,8 @@ public class ArrayDeque<T> {
     int start;
     int next;
 
-    /* start keep tracking on the start index of this array -> start-1 keep tracking on the index of this array which count from 0 to left*/
-    /* next keep tracking on the next index of this array -> next+1 keep tracking on the index of this array which count from left to right*/
+    /* start keep tracking on the next available initial index of this array -> start+1 keep tracking on the index of this array which count left to right*/
+    /* next keep tracking on the next available next index of this array -> next-1 keep tracking on the index of this array which count from 0 to right*/
     public ArrayDeque() {
         array = (T[]) new Object[8];
         size = 0;
@@ -18,16 +18,6 @@ public class ArrayDeque<T> {
         start = capacity - 1;
         next = 0;
     }
-
-//    public ArrayDeque(T[] array) {
-//        size = array.length;
-//        T[] newarray = (T[]) new Object[size+1];
-//        System.arraycopy(array, 0, newarray, 0, size);
-//        this.array = array;
-//        capacity = array.length;
-//        start = capacity-1;
-//        next = capacity-1;
-//    }
 
     /* change the size of array*/
     public void resize(int newCapacity) {
@@ -50,6 +40,7 @@ public class ArrayDeque<T> {
 
 
     /*Adds an item of type T to the front of the deque. You can assume that item is never null.*/
+    @Override
     public void addFirst(T item){
         if(size == capacity){
             resize(capacity*2);
@@ -60,6 +51,7 @@ public class ArrayDeque<T> {
     }
 
     /*Adds an item of type T to the back of the deque. You can assume that item is never null.*/
+    @Override
     public void addLast(T item){
         if(size == capacity){
             resize(capacity*2);
@@ -67,11 +59,6 @@ public class ArrayDeque<T> {
         array[next] = item;
         next = (next + 1) % capacity; // Wrap around if necessary
         size++;
-    }
-
-    /*Returns true if deque is empty, false otherwise.*/
-    public boolean isEmpty(){
-        return size == 0;
     }
 
     /*  return the index in the instance vaiable array*/
@@ -82,6 +69,7 @@ public class ArrayDeque<T> {
         }else{return i % capacity;}
     }
 
+    @Override
     public void printDeque(){
         if(size == 0){
             return ;
@@ -102,11 +90,12 @@ public class ArrayDeque<T> {
     }
 
     // For arrays of length 16 or more, the number of elements in the array under 25% the length of the array, you should resize the size of the array down.
+    @Override
     public T removeFirst(){
         if(size == 0){
             return null;
         }
-        int a = (start + 1) % capacity;
+        int a = (start + 1 + capacity) % capacity;
         T temp = array[a];
         array[a] = null;
         start = a;
@@ -115,6 +104,7 @@ public class ArrayDeque<T> {
         return temp;
     }
 
+    @Override
     public T removeLast(){
         if(size == 0){
             return null;
@@ -128,16 +118,18 @@ public class ArrayDeque<T> {
         return temp;
     }
 
+    @Override
     public T get(int index){
         return array[indexvalidator(index)];
     }
 
+    @Override
     public int size(){
         return size;
     }
     
     public boolean equals(Object o){
-        if (!(o instanceof LinkedListDeque)){
+        if (!(o instanceof ArrayDeque)){
             return false;
         }
         ArrayDeque<T> other = (ArrayDeque<T>) o;

@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 
 
 /** Performs some basic linked list tests. */
-public class LinkedListDequeTest {
+public class LinkedListDequeTest<T> {
 
     @Test
     /** Adds a few things to the list, checking isEmpty() and size() are correct,
