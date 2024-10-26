@@ -84,7 +84,7 @@ public class LinkedListDeque<T>{
 
     /*  Removes and returns the item at the front of the deque. If no such item exists, returns null. */
     public T removeFirst(){
-        if (this.size == 0){
+        if (this.size <= 0){
             return null;
         } else {
             Node<T> tmp = this.sentinel.next;

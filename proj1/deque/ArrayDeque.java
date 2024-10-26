@@ -106,8 +106,7 @@ public class ArrayDeque<T> {
         if(size == 0){
             return null;
         }
-        int a = start+1;
-        a = a % capacity;
+        int a = (start + 1) % capacity;
         T temp = array[a];
         array[a] = null;
         start = a;
@@ -120,8 +119,7 @@ public class ArrayDeque<T> {
         if(size == 0){
             return null;
         }
-        int a = next-1;
-        a = a % capacity;
+        int a = (next - 1 + capacity) % capacity;
         T temp = array[a];
         array[a] = null;
         next = a;
