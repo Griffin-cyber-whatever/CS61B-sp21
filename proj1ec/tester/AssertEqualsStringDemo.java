@@ -8,6 +8,7 @@ public class AssertEqualsStringDemo {
     @Test
     public void test1() {
         int expected = 20;
+        /* StdRandom.uniform(int N): Returns a random integer between 0 (inclusive) and N (exclusive).*/
         int actual = StdRandom.uniform(4);
         assertEquals("Oh noooo!\nThis is bad:\n   Random number " + actual 
                      + " not equal to " + expected + "!", 

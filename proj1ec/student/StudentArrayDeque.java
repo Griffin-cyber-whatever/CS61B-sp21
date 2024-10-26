@@ -1,5 +1,5 @@
 package student;
-
+/* A buggy implementation of */
 public class StudentArrayDeque<T> {
     private T[] a = (T[]) (new Object[8]);
     private int b = 8;
