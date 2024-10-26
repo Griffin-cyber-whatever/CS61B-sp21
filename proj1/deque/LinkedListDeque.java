@@ -1,8 +1,9 @@
 package deque;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-public class LinkedListDeque<T> implements Deque<T> {
-
-    private class Node <T>{
+public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
+    private class Node<T> {
         public T item;
         public Node<T> next;
         public Node<T> prev;
@@ -141,7 +142,7 @@ public class LinkedListDeque<T> implements Deque<T> {
         if(index == 0){
             return tmp;
         }
-        return getRecursive(index-1, sentinel.next);
+    return getRecursive(index-1, sentinel.next);
     }
 
     /* Returns whether the parameter o is equal to the Deque. */
@@ -161,4 +162,39 @@ public class LinkedListDeque<T> implements Deque<T> {
         return true;
     }
 
+    private class DequeIterator implements Iterator<T> {
+        private Node<T> current = sentinel;
+        private int remainingElements;
+
+        public DequeIterator(){
+            this.current = current.next;
+            this.remainingElements = size;
+        }
+
+        @Override
+        public boolean hasNext(){
+            return this.current != sentinel;
+        }
+
+        @Override
+        public T next(){
+            if (this.current == sentinel){
+                throw new NoSuchElementException();
+            }
+            T ret = this.current.item;
+            current = current.next;
+            remainingElements--;
+            return ret;
+        }
+
+        @Override
+        public void remove(){
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    @Override
+    public Iterator<T> iterator(){
+        return new DequeIterator();
+    }
 }

@@ -5,18 +5,17 @@ import org.junit.Test;
 import java.util.Comparator;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class MaxArrayDequeTest {
     @Test
     public void IntegerTestComparator() {
-        MaxArrayDeque<Integer> deque = new MaxArrayDeque<>();
+        IntegerComparator comparator = new IntegerComparator();
+        MaxArrayDeque<Integer> deque = new MaxArrayDeque<>(comparator);
         deque.addLast(3);
         deque.addLast(5);
         deque.addLast(2);
         deque.addLast(7);
 
-        IntegerComparator comparator = new IntegerComparator();
         assertEquals(7, (int) deque.max(comparator));
     }
 

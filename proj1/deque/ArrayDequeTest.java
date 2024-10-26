@@ -115,4 +115,17 @@ public class ArrayDequeTest{
         assertTrue(ad1.removeFirst() == null);
     }
 
+//    @Test
+//    public void iteratorTest(){
+//        ArrayDeque<Integer> ad1 = new ArrayDeque<>();
+//        ad1.addLast(1);
+//        ad1.addLast(2);
+//        ad1.addLast(3);
+//        ad1.addLast(4);
+//
+//        for( Integer i : ad1 ){
+//            System.out.println(i);
+//        }
+//    }
+
 }

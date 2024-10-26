@@ -1,6 +1,9 @@
 package deque;
 
-public class ArrayDeque<T> implements Deque<T>{
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     /* size will keep tracking on how many elements are we actually using
     *  capacity will keep tracking on the actual capacity of the array*/
     int size;
@@ -139,5 +142,41 @@ public class ArrayDeque<T> implements Deque<T>{
             }
         }
         return true;
+    }
+
+    private class DequeIterator implements Iterator<T> {
+        private int currentIndex = 0;
+        private int remainingElements = size;
+
+        public DequeIterator(){
+            this.currentIndex = indexvalidator(currentIndex);
+            this.remainingElements = size;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return remainingElements > 0;
+        }
+
+        @Override
+        public T next() {
+            if(!hasNext()){
+                throw new NoSuchElementException();
+            }
+            T temp = array[currentIndex];
+            currentIndex = (currentIndex + 1) % capacity;
+            remainingElements--;
+            return temp;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new DequeIterator();
     }
 }
