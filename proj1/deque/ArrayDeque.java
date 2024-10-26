@@ -88,7 +88,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             return;
         }
         if ((double)size/capacity < 0.25){
-            resize(size * 4 -1);
+            resize(capacity/4);
         }
     }
 
