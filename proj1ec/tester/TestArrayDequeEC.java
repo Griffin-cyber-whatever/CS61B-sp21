@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import student.StudentArrayDeque;
 
-public class TestArrayDequeEc {
+public class TestArrayDequeEC {
 
     @Test
     public void testIsEmpty() {
