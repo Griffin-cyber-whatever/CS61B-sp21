@@ -6,11 +6,11 @@ import java.util.NoSuchElementException;
 public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     /* size will keep tracking on how many elements are we actually using
     *  capacity will keep tracking on the actual capacity of the array*/
-    int size;
-    int capacity;
-    T[] array;
-    int start;
-    int next;
+    private int size;
+    private int capacity;
+    private T[] array;
+    private int start;
+    private int next;
 
     /* start keep tracking on the next available initial index of this array -> start+1 keep tracking on the index of this array which count left to right*/
     /* next keep tracking on the next available next index of this array -> next-1 keep tracking on the index of this array which count from 0 to right*/
@@ -23,7 +23,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     /* change the size of array*/
-    public void resize(int newCapacity) {
+    private void resize(int newCapacity) {
         T[] newArray = (T[]) new Object[newCapacity];
 
         // Calculate where the elements are in the current array and copy them over
@@ -65,7 +65,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     /*  return the index in the instance vaiable array*/
-    public int indexvalidator(int index){
+    private int indexvalidator(int index){
         int i = index + start + 1;
         if(i < capacity){
             return i;
@@ -83,7 +83,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         System.out.println(array[indexvalidator(size-1)]);
     }
 
-    public void memoryEfficiency(){
+    private void memoryEfficiency(){
         if (size <= 16){
             return;
         }

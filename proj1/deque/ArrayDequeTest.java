@@ -31,8 +31,6 @@ public class ArrayDequeTest{
         assertTrue(ad2.get(2) == 5);
         assertTrue(ad2.get(1) == 6);
         assertTrue(ad2.get(0) == 7);
-        assertTrue(ad2.indexvalidator(0) == 3);
-        assertTrue(ad2.indexvalidator(1) == 4);
     }
 
     @Test
@@ -55,7 +53,6 @@ public class ArrayDequeTest{
         assertTrue(ad1.get(0) == 1);
         assertTrue(ad1.get(1) == 2);
         assertTrue(ad1.get(2) == 3);
-        assertTrue(ad1.indexvalidator(0) == 0);
     }
 
     @Test

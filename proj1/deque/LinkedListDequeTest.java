@@ -121,5 +121,17 @@ public class LinkedListDequeTest<T> {
         }
 
     }
+
+    @Test
+    public void randomTest(){
+        LinkedListDeque<Integer> lld1 = new LinkedListDeque<Integer>();
+        lld1.addFirst(1);
+        lld1.removeLast();
+        lld1.isEmpty();
+        lld1.isEmpty();
+        lld1.addFirst(5);
+        int n = lld1.removeLast();
+        assertEquals(5,n);
+    }
 }
 
