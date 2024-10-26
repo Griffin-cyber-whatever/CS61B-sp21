@@ -25,7 +25,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     /* change the size of array*/
     private void resize(int newCapacity) {
         if (newCapacity <= 0) {
-            throw new IllegalArgumentException("New capacity must be greater than zero");
+            return;
         }
         T[] newArray = (T[]) new Object[newCapacity];
 
@@ -87,7 +87,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     private void memoryEfficiency(){
-        if ((double)size/capacity < 0.25 && size <= 8){
+        if ((double)size/capacity < 0.25 && size >= 8){
             resize(capacity/2);
         }
     }
