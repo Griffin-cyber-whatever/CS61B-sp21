@@ -1,5 +1,6 @@
 package deque;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
 public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
@@ -134,15 +135,15 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         if(index == 0){
             return tmp;
         }
-    return getRecursive(index-1, sentinel.next);
+    return getRecursive(index-1, tmp.next);
     }
 
     /* Returns whether the parameter o is equal to the Deque. */
     public boolean equals(Object o){
-        if (!(o instanceof LinkedListDeque)){
+        if (!(o instanceof LinkedListDeque) || !(o instanceof ArrayDeque)){
             return false;
         }
-        LinkedListDeque<T> tmp = ((LinkedListDeque<T>)o);
+        Deque<T> tmp = (Deque<T>) o;
         if(tmp.size() != this.size()){
             return false;
         }
