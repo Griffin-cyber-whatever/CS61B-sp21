@@ -84,11 +84,8 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     private void memoryEfficiency(){
-        if (size <= 16){
-            return;
-        }
-        if ((double)size/capacity < 0.25){
-            resize(capacity/4);
+        if ((double)size/capacity < 0.25 && size <= 8){
+            resize(capacity/2);
         }
     }
 
@@ -132,7 +129,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     }
     
     public boolean equals(Object o){
-        if (!(o instanceof LinkedListDeque) || !(o instanceof ArrayDeque)){
+        if ((o instanceof LinkedListDeque) || (o instanceof ArrayDeque)){
             return false;
         }
         Deque<T> other = (Deque<T>) o;

@@ -140,7 +140,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
 
     /* Returns whether the parameter o is equal to the Deque. */
     public boolean equals(Object o){
-        if (!(o instanceof LinkedListDeque) || !(o instanceof ArrayDeque)){
+        if ((o instanceof LinkedListDeque) || (o instanceof ArrayDeque)){
             return false;
         }
         Deque<T> tmp = (Deque<T>) o;
