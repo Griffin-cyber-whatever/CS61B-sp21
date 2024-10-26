@@ -24,6 +24,9 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 
     /* change the size of array*/
     private void resize(int newCapacity) {
+        if (newCapacity <= 0) {
+            throw new IllegalArgumentException("New capacity must be greater than zero");
+        }
         T[] newArray = (T[]) new Object[newCapacity];
 
         // Calculate where the elements are in the current array and copy them over
@@ -127,22 +130,41 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     public int size(){
         return size;
     }
-    
-    public boolean equals(Object o){
-        if ((o instanceof LinkedListDeque) || (o instanceof ArrayDeque)){
+
+    @Override
+    public boolean equals(Object o) {
+        // Check if the object is the same instance
+        if (this == o) {
+            return true;
+        }
+
+        // Check if `o` is null or not an instance of `Deque`
+        if (!(o instanceof Deque)) {
             return false;
         }
+
+        // Cast to Deque<T> for comparison
         Deque<T> other = (Deque<T>) o;
-        if (size != other.size()){
+
+        // Compare sizes
+        if (this.size() != other.size()) {
             return false;
         }
-        for(int i = 0; i < size; i++){
-            if(!(other.get(i)).equals(this.get(i))){
+
+        // Compare elements one by one
+        for (int i = 0; i < this.size(); i++) {
+            T thisElement = this.get(i);
+            T otherElement = other.get(i);
+
+            // Use null-safe equality check
+            if (thisElement == null ? otherElement != null : !thisElement.equals(otherElement)) {
                 return false;
             }
         }
+
         return true;
     }
+
 
     private class DequeIterator implements Iterator<T> {
         private int currentIndex = 0;

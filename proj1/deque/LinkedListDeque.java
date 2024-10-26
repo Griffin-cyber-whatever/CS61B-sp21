@@ -138,22 +138,40 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     return getRecursive(index-1, tmp.next);
     }
 
-    /* Returns whether the parameter o is equal to the Deque. */
-    public boolean equals(Object o){
-        if ((o instanceof LinkedListDeque) || (o instanceof ArrayDeque)){
+    @Override
+    public boolean equals(Object o) {
+        // Check if the object is the same instance
+        if (this == o) {
+            return true;
+        }
+
+        // Check if `o` is null or not an instance of `Deque`
+        if (!(o instanceof Deque)) {
             return false;
         }
-        Deque<T> tmp = (Deque<T>) o;
-        if(tmp.size() != this.size()){
+
+        // Cast to Deque<T> for comparison
+        Deque<T> other = (Deque<T>) o;
+
+        // Compare sizes
+        if (this.size() != other.size()) {
             return false;
         }
-        for(int i = 0; i < size; i++){
-            if(!tmp.get(i).equals(this.get(i))){
+
+        // Compare elements one by one
+        for (int i = 0; i < this.size(); i++) {
+            T thisElement = this.get(i);
+            T otherElement = other.get(i);
+
+            // Use null-safe equality check
+            if (thisElement == null ? otherElement != null : !thisElement.equals(otherElement)) {
                 return false;
             }
         }
+
         return true;
     }
+
 
     private class DequeIterator implements Iterator<T> {
         private Node<T> current = sentinel;
