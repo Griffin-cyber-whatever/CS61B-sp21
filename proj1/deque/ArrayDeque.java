@@ -87,7 +87,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     private void memoryEfficiency(){
-        if ((double)size/capacity < 0.25 && size >= 8){
+        if (size < capacity / 4 && size >= 16){
             resize(capacity/2);
         }
     }
