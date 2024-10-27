@@ -22,6 +22,29 @@ public class TimeAList {
     }
 
     public static void timeAListConstruction() {
-        // TODO: YOUR CODE HERE
+        // Your times should be in seconds. You should use the Stopwatch class.
+        int testRounds = 10000000;
+        Stopwatch timer = new Stopwatch();
+        AList<Integer> Ns = new AList<>();
+        AList<Double> times = new AList<>();
+        AList<Integer> opCounts = new AList<>();
+        for (int i = 1000; i <= testRounds; i *= 2) {
+            tableDateN(i, Ns, times, opCounts);
+        }
+        printTimingTable(Ns, times, opCounts);
+    }
+
+
+    // collect data based on the first argument N, modify the given object with the collected data
+    public static void tableDateN(int n, AList<Integer> Ns, AList<Double> times, AList<Integer> opCounts) {
+        AList<Integer> N = new AList<>();
+        Stopwatch timer = new Stopwatch();
+        for (int i = 0; i < n; i++) {
+            N.addLast(1);
+        }
+        double timeInSeconds = timer.elapsedTime();
+        Ns.addLast(n);
+        times.addLast(timeInSeconds);
+        opCounts.addLast(n);
     }
 }

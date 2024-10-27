@@ -31,14 +31,24 @@ public class AList<Item> {
         items = a;
     }
 
-    /** Inserts X into the back of the list. */
-    public void addLast(Item x) {
-        if (size == items.length) {
-            resize(size + 1);
-        }
+//    /** Inserts X into the back of the list. */
+//    public void addLast(Item x) {
+//        if (size == items.length) {
+//            resize(size + 1);
+//        }
+//
+//        items[size] = x;
+//        size = size + 1;
+//    }
 
-        items[size] = x;
-        size = size + 1;
+    // better design
+    public void addLast(Item item) {
+        double factor = 1.01;
+        if (size == items.length) {
+            resize((int)(size * factor));
+        }
+        items[size] = item;
+        size++;
     }
 
     /** Returns the item from the back of the list. */
@@ -64,3 +74,8 @@ public class AList<Item> {
         return x;
     }
 }
+
+// Why is getLast so slow? What is special about your LinkedListDeque that makes the getLast function faster?
+// (1) because it needs to traverse through entire existing list everytime which results in O(n) run time complexity
+// (2) use DoubleEndedDeque which use a circular structure allow us to start this list from a special sentinel node which linked
+// to both first and last node and results in constant time complexity
