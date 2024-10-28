@@ -23,7 +23,7 @@ public class TimeAList {
 
     public static void timeAListConstruction() {
         // Your times should be in seconds. You should use the Stopwatch class.
-        int testRounds = 10000000;
+        int testRounds = 64000;
         AList<Integer> Ns = new AList<>();
         AList<Double> times = new AList<>();
         AList<Integer> opCounts = new AList<>();
