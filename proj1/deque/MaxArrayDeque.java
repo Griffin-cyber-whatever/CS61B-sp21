@@ -25,20 +25,26 @@ public class MaxArrayDeque <T> extends ArrayDeque<T> {
 
     /*  returns the maximum element in the deque as governed by the previously given Comparator */
     /* returns null if array is empty or comparator hasn't been initialized*/
+//    public T max(){
+//        if(super.isEmpty()){
+//            return null;
+//        }
+//        if(this.comparator == null){
+//            return null;
+//        }
+//        T max = get(0);
+//        for(int i = 1; i < super.size(); i++){
+//            if(comparator.compare(get(i), max) > 0){
+//                max = get(i);
+//            }
+//        }
+//        return max;
+//    }
+    // inefficient approach when u have already design the whale
+
+    // better apporach
     public T max(){
-        if(super.isEmpty()){
-            return null;
-        }
-        if(this.comparator == null){
-            return null;
-        }
-        T max = get(0);
-        for(int i = 1; i < super.size(); i++){
-            if(comparator.compare(get(i), max) > 0){
-                max = get(i);
-            }
-        }
-        return max;
+        return max(comparator);
     }
 
     private boolean equals(Object o, Comparator<T> comparator){
