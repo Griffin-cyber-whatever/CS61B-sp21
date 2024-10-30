@@ -42,7 +42,7 @@ public class MaxArrayDeque <T> extends ArrayDeque<T> {
 //    }
     // inefficient approach when u have already design the whale
 
-    // better apporach
+    // better approach
     public T max(){
         return max(comparator);
     }
