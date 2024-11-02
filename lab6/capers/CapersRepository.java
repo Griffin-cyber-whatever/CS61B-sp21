@@ -21,7 +21,7 @@ public class CapersRepository {
     static final File CWD = new File(System.getProperty("user.dir"));
 
     /** Main metadata folder. */
-    static final File CAPERS_FOLDER = new File(CWD, "capers"); // TODO Hint: look at the `join`
+    static final File CAPERS_FOLDER = new File(CWD, ".capers"); // TODO Hint: look at the `join`
                                             //      function in Utils
 
     /**
@@ -35,14 +35,16 @@ public class CapersRepository {
      */
     public static void setupPersistence() {
         // TODO
-        File dogsfolder = new File(CAPERS_FOLDER, "dogs");
-        if (!dogsfolder.exists()) {
-            dogsfolder.mkdir();
-        }
         File storyFile = new File(CAPERS_FOLDER, "story.txt");
         try {
+            if (!CAPERS_FOLDER.exists()) {
+                CAPERS_FOLDER.mkdir();
+            }
             if (!storyFile.exists()) {
                 storyFile.createNewFile();
+            }
+            if (!Dog.DOG_FOLDER.exists()) {
+                Dog.DOG_FOLDER.mkdir();
             }
         } catch (IOException e) {
             System.out.println("Error occurs when creating story.txt: " + e.getMessage());
@@ -57,7 +59,7 @@ public class CapersRepository {
     public static void writeStory(String text) {
         // TODO
         File story = new File(CAPERS_FOLDER, "story.txt");
-        String oldtext = readContentsAsString(story).trim();
+        String oldtext = readContentsAsString(story);
         String newtext = oldtext + text + "\n";
         Utils.writeContents(story, newtext);
         System.out.println(newtext);
