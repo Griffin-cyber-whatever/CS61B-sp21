@@ -81,7 +81,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         if (key == null) {
             throw new IllegalArgumentException("calls put() with a null key");
         }
-        put(root, key, value);
+        root = put(root, key, value);
     }
 
     private Node put(Node node, K key, V value) {
@@ -107,15 +107,19 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     @Override
     public V remove(K key) {
-        return remove(key, root);
+        V value = get(key);
+        root = remove(key, root);
+        return value;
     }
 
     @Override
     public V remove(K key, V value) {
-        return remove1(key, value, root);
+        V value1 = get(key);
+        root = remove1(key, value, root);
+        return value1;
     }
 
-    private V remove(K key, Node node) {
+    private Node remove(K key, Node node) {
         if (node == null) {
             return null;
         }
@@ -130,9 +134,12 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
             } else if (node.right == null) {
                 node = node.left;
             } else {
-                node.value = findSuccessor(node);
+                Node tmp = findSuccessor(node);
+                node.value = tmp.value;
+                node.key = tmp.key;
+                node.right = remove(tmp.key, node.right);
             }
-            return value;
+            return node;
         } else if (cmp < 0) {
             return remove(key, node.left);
         } else {
@@ -140,7 +147,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         }
     }
 
-    private V remove1(K key, V value, Node node) {
+    private Node remove1(K key, V value, Node node) {
         if (node == null) {
             return null;
         }
@@ -154,9 +161,12 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
             } else if (node.right == null) {
                 node = node.left;
             } else {
-                node.value = findSuccessor(node);
+                Node tmp = findSuccessor(node);
+                node.value = tmp.value;
+                node.key = tmp.key;
+                node.right = remove(tmp.key, node.right);
             }
-            return value;
+            return node;
         } else if (cmp < 0) {
             return remove(key, node.left);
         } else {
@@ -164,14 +174,12 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         }
     }
 
-    private V findSuccessor(Node node) {
+    private Node findSuccessor(Node node) {
         node = node.right;
         while (node.left != null) {
             node = node.left;
         }
-        V value = node.value;
-        node = null;
-        return value;
+        return node;
     }
 
     @Override
