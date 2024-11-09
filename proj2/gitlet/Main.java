@@ -1,7 +1,5 @@
 package gitlet;
 
-import org.checkerframework.checker.units.qual.C;
-
 import java.io.File;
 
 /** Driver class for Gitlet, a subset of the Git version-control system.
