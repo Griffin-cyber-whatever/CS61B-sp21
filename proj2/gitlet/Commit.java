@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -222,7 +224,8 @@ public class Commit implements Serializable {
 
     // method to generate formatted timestamp
     private String formatTimestamp(String timestamp) {
-        long epoch = Long.parseLong(timestamp);
+        OffsetDateTime dateTime = OffsetDateTime.parse(timestamp, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        long epoch = dateTime.toInstant().getEpochSecond();
         Date date = new Date(epoch * 1000);  // Convert to milliseconds
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy Z");
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT-8")); // Set the timezone (you can adjust as needed)

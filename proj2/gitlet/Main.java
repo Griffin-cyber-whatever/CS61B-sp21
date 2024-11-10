@@ -27,14 +27,14 @@ public class Main {
             Repository repo = Repository.load();
             switch(firstArg) {
                 case "add":
-                    if (args.length != 2 || args[1] == null) {
+                    if (args.length != 2 || args[1] == null || args[1].isEmpty()) {
                         break;
                     }
                     repo.add(args[1]);
                     break;
                 // add new commit by using java gielet.Main commit "message"
                 case "commit":
-                    if (args.length != 2 || args[1] == null) {
+                    if (args.length != 2 || args[1] == null || args[1].isEmpty()) {
                         System.out.println("Please enter a commit message.");
                         System.exit(0);
                     } else {
@@ -42,7 +42,7 @@ public class Main {
                     }
                     break;
                 case "rm":
-                    if (args.length != 2 || args[1] == null) {
+                    if (args.length != 2 || args[1] == null || args[1].isEmpty()) {
                         System.out.println("Please enter a commit message.");
                         System.exit(0);
                     } else {
@@ -60,7 +60,7 @@ public class Main {
                     }
                     break;
                 case "find":
-                    if (args.length != 2 || args[1] == null) {
+                    if (args.length != 2 || args[1] == null || args[1].isEmpty()) {
                         System.exit(0);
                     } else{
                         String tmp = repo.find(args[1]);
@@ -81,24 +81,24 @@ public class Main {
                 case "checkout":
                     // case 1 java gitlet.Main checkout -- [file name]
                     // overwrite the file in CWD with the file in commit
-                    if (args.length == 3 && args[1].equals("--") && args[2] != null) {
+                    if (args.length == 3 && args[1].equals("--") && args[2] != null && !args[2].isEmpty()) {
                         repo.overWriteWithSameFileName(args[2]);
                     }
                     // case 2 java gitlet.Main checkout [commit id] -- [file name]
                     // overwrite the file with [file name] with the file in [commit id] the commit\
                     // commit id could be
-                    else if (args.length == 4 && args[1] != null && args[2].equals("--") && args[3] != null) {
+                    else if (args.length == 4 && args[1] != null && args[2].equals("--") && args[3] != null && !args[3].isEmpty()) {
                         repo.overWriteWithDifferentFileName(args[3], args[1]);
                     }
                     // case 3 java gitlet.Main checkout [branch name]
                     // make the given branch became the current branch
                     // overwrite the CWD entirely so that it's identical to that branch
-                    else if (args.length == 2 && args[1] != null) {
+                    else if (args.length == 2 && args[1] != null && !args[1].isEmpty()) {
                         repo.overWriteBranch(args[1]);
                     }
                     break;
                 case "branch":
-                    if (args.length != 2 || args[1] == null) {
+                    if (args.length != 2 || args[1] == null || args[1].isEmpty()) {
                         System.exit(0);
                     }
                     repo.branch(args[1]);
@@ -114,13 +114,13 @@ public class Main {
                     //  Checks out all the files tracked by the given commit.
                     //  Removes tracked files that are not present in that commit.
                     //  Also moves the current branch’s head to that commit node.
-                    if (args.length != 2 || args[1] == null) {
+                    if (args.length != 2 || args[1] == null || args[1].isEmpty()) {
                         System.exit(0);
                     }
                     repo.reset(args[1]);
                     break;
                 case "merge":
-                    if (args.length != 2 || args[1] == null) {
+                    if (args.length != 2 || args[1] == null || args[1].isEmpty()) {
                         System.exit(0);
                     }
                     repo.merge(args[1]);
