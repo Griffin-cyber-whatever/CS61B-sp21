@@ -20,16 +20,17 @@ public class Main {
             System.exit(0);
         }
         String firstArg = args[0];
+        if (firstArg.equals("init")) {
+            Repository init = new Repository();
+        }
+        // it will throw exception if there don't have saved a repository file
         Repository repo = Repository.load();
         switch(firstArg) {
-            case "init":
-                // TODO: handle the `init` command
-                File cwd = new File(System.getProperty("user.dir"));
-                break;
             case "add":
-                // TODO: handle the `add [filename]` command
-                break;
-            // TODO: FILL THE REST IN
+                if (args.length != 2 || args[1] == null) {
+                    break;
+                }
+                repo.add(args[1]);
             // add new commit by using java gielet.Main commit "message"
             case "commit":
                 if (args.length != 2 || args[1] == null) {
@@ -45,11 +46,14 @@ public class Main {
                 } else {
                     repo.remove(args[1]);
                 }
-            // TODO
             case "log":
-                break;
+                if (args.length == 1) {
+                    repo.log();
+                }
             case "global-log":
-                break;
+                if (args.length == 1) {
+                    repo.globalLog();
+                }
             case "find":
                 if (args.length != 2 || args[1] == null) {
                     System.exit(0);

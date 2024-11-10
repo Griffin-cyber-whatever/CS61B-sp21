@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import static gitlet.Utils.*;
 
@@ -38,10 +39,11 @@ public class Commit implements Serializable {
 
     /** The message of this Commit. */
     private final String message;
-    private String author;
     private final String timestamp;
     // (for merges) a second parent reference
     private String parent;
+    // if it's regular commit secondParent will be set to null
+    // it will not be null if the commit is merged from two commits
     private String secondParent;
     private String hashCode;
 
@@ -80,7 +82,6 @@ public class Commit implements Serializable {
         this.message = message;
         this.timestamp = LocalDateTime.now().toString();
         this.parent = parent;
-        this.author = parentCommit.author;
         this.secondParent = (parent == null) ? null : parentCommit.getParent();
 
         // Set the content based on parent commit and staging area
@@ -114,7 +115,7 @@ public class Commit implements Serializable {
 
     // get commit unique hashcode by provide string with metadata and assign the actual address of current commit
     private void hash() {
-        String n = timestamp + message + author + content.toString();
+        String n = timestamp + message + content.toString();
         hashCode = sha1(n);
     }
 
@@ -133,6 +134,10 @@ public class Commit implements Serializable {
 
     public String getSecondParent(){
         return secondParent;
+    }
+
+    public void setSecondParent(String secondParent){
+        this.secondParent = secondParent;
     }
 
     public String getMessage(){
@@ -160,15 +165,6 @@ public class Commit implements Serializable {
         return readObject(obj, Commit.class);
     }
 
-    // generate a single block of commit log
-    public String writeCommitLog(){
-        String n = String.format("===\n" +
-                "commit %s\n" +
-                "Date %s\n" +
-                "%s\n\n",
-                hashCode, timestamp, message);
-        return n;
-    }
 
     // return the content of that file in the current commit
     public String getFileContent(String filename){
@@ -178,6 +174,16 @@ public class Commit implements Serializable {
             tmp = Blobs.getContent(hash);
         }
         return tmp;
+    }
+
+    // generate a single block of commit log
+    public String writeCommitLog(){
+        String n = String.format("===\n" +
+                "commit %s\n" +
+                "Date %s\n" +
+                "%s\n\n",
+                hashCode, timestamp, message);
+        return n;
     }
 
     // generate a single block of merge log
@@ -195,12 +201,33 @@ public class Commit implements Serializable {
     }
 
     public String log(){
-        // TODO finish it after finish merge
-        return writeCommitLog();
+        StringBuilder tmp = new StringBuilder();
+        Commit i = this;
+        while (i != null){
+            String secondParent = i.getSecondParent();
+            if (secondParent == null){
+                tmp.append(i.writeCommitLog());
+            } else {
+                tmp.append(i.writeMergeLog());
+            }
+            i = Commit.getCommit(i.getParent());
+        }
+        return tmp.toString();
     }
 
-    public String GlobalLog(){
-        // TODO same reason as normal log
-        return writeMergeLog();
+    // traverse through the entire commit directory and return the log from all of them
+    public static String GlobalLog(){
+        StringBuilder tmp = new StringBuilder();
+        List<String> commitFiles = plainFilenamesIn(commits);
+        for (String filename : commitFiles){
+            Commit i = Commit.getCommit(filename);
+            String secondParent = i.getSecondParent();
+            if (secondParent == null){
+                tmp.append(i.writeCommitLog());
+            } else {
+                tmp.append(i.writeMergeLog());
+            }
+        }
+        return tmp.toString();
     }
 }

@@ -46,12 +46,15 @@ public class Repository implements Serializable {
 
     /* Each branch (e.g., main, master, feature) is just a pointer (reference) to the latest commit on that branch.*/
     // HEAD is a special pointer that refers to the current branch
-    private HashMap<String, String> head;
+    private HashMap<String, String> head = new HashMap<>();;
 
     /* we will keep track
     on what branch will HEAD pointer in at hashmap head and the actual reference to commit in here*/
     private String HEAD;
-    /* initialize a repo with no argument*/
+
+    /**
+     * Initializes a new repository with a master branch and an initial commit.
+     */
     public Repository() {
         Commit init = new Commit();
         head.put("master", init.getHash());
@@ -62,7 +65,7 @@ public class Repository implements Serializable {
 
     /* add new commit to the given branch
     * If no files have been staged, abort. Print the message No changes added to the commit.*/
-    // TODO potential risk if u want to detached HEAD while current implmentation works fine for attaching new commit to the
+    // TODO potential risk if u want to detached HEAD while current implementation works fine for attaching new commit to the
     //  previous commit without changing branch
     public void commit(String message){
         if (emptyStagingArea()){
@@ -85,16 +88,17 @@ public class Repository implements Serializable {
 
     public void add(String filename) {
         // get the latest commit in master branch
-        Commit tmp = Commit.getCommit(HEAD);
-        assert tmp != null;
+        Commit currentCommit = Commit.getCommit(HEAD);
+
         File f = new File(CWD, filename);
-        String n = compare(filename, f, tmp.getContent());
+        String n = compare(filename, f, currentCommit.getContent());
         if (n != null) {
             File file = new File(CWD, filename);
             Blobs newFileContent = new Blobs(readContentsAsString(file));
             newFileContent.save();
             Staging staging = Staging.load();
             staging.getAddition().put(filename, newFileContent.getBlobId());
+            staging.save();
         }
     }
 
@@ -116,6 +120,7 @@ public class Repository implements Serializable {
             // the file is neither staged nor tracked by the head commit
             System.out.println("No reason to remove the file.");
         }
+        staging.save();
     }
 
     /* compare the content in the second argument and the file with the first argument as its name in the third argument
@@ -179,7 +184,7 @@ public class Repository implements Serializable {
 
         List<String> untracked = new ArrayList<String>();
         status.append("\n=== Modifications Not Staged For Commit ===" + "\n");
-        HashMap<String, String> future = Commit.SetContent(Commit.getCommit(head.get(currentBranch)));
+        HashMap<String, String> future = Commit.SetContent(Commit.getCommit(HEAD));
         List<String> files = plainFilenamesIn(CWD);
         for (String file : files) {
             File currentFile = new File(CWD, file);
@@ -254,10 +259,11 @@ public class Repository implements Serializable {
         String branchId = head.get(branch);
         if (branchId == null) {
             System.out.println("No such branch exists.");
-            System.exit(0);
+            return;
         }
         if (branch.equals(head.get("HEAD"))) {
             System.out.println("No need to checkout the current branch.");
+            return;
         }
         overWriteCWD(branchId);
         // it will set HEAD to the given branch if HEAD and given branch didn't point to the same branch
@@ -294,7 +300,7 @@ public class Repository implements Serializable {
         }
     }
 
-    public void untrackedFileExists(){
+    private void untrackedFileExists(){
         List<String> files = plainFilenamesIn(CWD);
         Commit currentCommit = Commit.getCommit(HEAD);
         HashMap<String, String> currentContent = currentCommit.getContent();
@@ -310,6 +316,7 @@ public class Repository implements Serializable {
     public void branch(String newBranch) {
         head.put("HEAD", newBranch);
         head.put(newBranch, HEAD);
+        save();
     }
 
     public void removeBranch(String branch) {
@@ -319,7 +326,10 @@ public class Repository implements Serializable {
                System.out.println("Cannot remove the current branch.");
                System.exit(0);
            }
-           else {head.remove(branch);}
+           else {
+               head.remove(branch);
+               save();
+           }
        } else {
            System.out.println("branch with that name does not exist.");
            System.exit(0);
@@ -393,6 +403,7 @@ public class Repository implements Serializable {
 
         // Handle each file based on its status in the three commits.
         for (String file : allFiles) {
+            // each file has its unique blob id, so we don't need to check its content
             String splitBlob = splitContent.get(file);
             String currentBlob = currentContent.get(file);
             String branchBlob = branchContent.get(file);
@@ -411,7 +422,6 @@ public class Repository implements Serializable {
                 handleConflict(file, currentBlob, branchBlob);
             }
         }
-
         String mergeLog = String.format("Merged %s into %s.", branch, head.get("HEAD"));
         commit(mergeLog);
     }
@@ -488,12 +498,18 @@ public class Repository implements Serializable {
         return null; // No common ancestor found (unlikely in Git)
     }
 
+    public void log(){
+        Commit current = Commit.getCommit(HEAD);
+        System.out.println(current.log());
+    }
+
+    public void globalLog(){
+        System.out.println(Commit.GlobalLog());
+    }
+
     private boolean emptyStagingArea(){
         Staging staging = Staging.load();
-        if (staging.getAddition() == null || staging.getDeletion() == null) {
-            return true;
-        }
-        return false;
+        return staging.getAddition().isEmpty() && staging.getDeletion().isEmpty();
     }
 
     // clear entire CWD except .git
@@ -505,10 +521,6 @@ public class Repository implements Serializable {
                 f.delete();
             }
         }
-    }
-
-    public HashMap<String, String> getHead() {
-        return head;
     }
 
     public void save(){
