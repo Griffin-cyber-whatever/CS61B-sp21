@@ -1,7 +1,9 @@
 package gitlet;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.*;
 
 import static gitlet.Utils.*;
@@ -65,23 +67,16 @@ public class Repository implements Serializable {
 
     private static void setup() {
         try {
-            if (!GITLET_DIR.exists()) {
-                repositoryFile.mkdir();
-            }
-            if (!Blobs.blobs.exists()) {
-                Blobs.blobs.mkdir();
-            }
-            if (!Commit.commits.exists()) {
-                Commit.commits.mkdir();
-            }
-            if (!repositoryFile.exists()) {
-                repositoryFile.createNewFile();
-            }
-            if (!Staging.StagingArea.exists()) {
-                Staging.StagingArea.createNewFile();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+            GITLET_DIR.mkdir();
+            Blobs.blobs.mkdir();
+            Commit.commits.mkdir();
+            repositoryFile.createNewFile();
+            Staging.StagingArea.createNewFile();
+        } catch (FileAlreadyExistsException e) {
+            // do nothing
+        } catch (IOException e) {
+            System.err.println("Failed to set up the repository: " + e.getMessage());
+            throw new IllegalStateException("Setup failed", e);
         }
     }
 
