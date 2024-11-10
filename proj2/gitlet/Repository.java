@@ -105,19 +105,27 @@ public class Repository implements Serializable {
         save();
     }
 
+    // stage the new version of that file if content in CWD and the latest commit has different
+    // otherwise remove it
     public void add(String filename) {
         // get the latest commit in master branch
         Commit currentCommit = Commit.getCommit(HEAD);
-
         File f = new File(CWD, filename);
-        String n = compare(filename, f, currentCommit.getContent());
-        if (n != null) {
+        String comparisonResult = compare(filename, f, currentCommit.getContent());
+
+        Staging staging = Staging.load();
+
+        if (comparisonResult != null) {
             File file = new File(CWD, filename);
             Blobs newFileContent = new Blobs(readContentsAsString(file));
             newFileContent.save();
-            Staging staging = Staging.load();
             staging.getAddition().put(filename, newFileContent.getBlobId());
             staging.save();
+        } else {
+            if (staging != null && staging.getAddition().containsKey(filename)) {
+                staging.getAddition().remove(filename);
+                staging.save();
+            }
         }
     }
 
