@@ -22,100 +22,101 @@ public class Main {
         String firstArg = args[0];
         if (firstArg.equals("init")) {
             Repository init = new Repository();
-        }
-        // it will throw exception if there don't have saved a repository file
-        Repository repo = Repository.load();
-        switch(firstArg) {
-            case "add":
-                if (args.length != 2 || args[1] == null) {
-                    break;
-                }
-                repo.add(args[1]);
-            // add new commit by using java gielet.Main commit "message"
-            case "commit":
-                if (args.length != 2 || args[1] == null) {
-                    System.out.println("Please enter a commit message.");
-                    System.exit(0);
-                } else {
-                    repo.commit(args[1]);
-                }
-            case "rm":
-                if (args.length != 2 || args[1] == null) {
-                    System.out.println("Please enter a commit message.");
-                    System.exit(0);
-                } else {
-                    repo.remove(args[1]);
-                }
-            case "log":
-                if (args.length == 1) {
-                    repo.log();
-                }
-            case "global-log":
-                if (args.length == 1) {
-                    repo.globalLog();
-                }
-            case "find":
-                if (args.length != 2 || args[1] == null) {
-                    System.exit(0);
-                } else{
-                    String tmp = repo.find(args[1]);
-                    if (tmp == null) {
-                        System.out.println("Found no commit with that message.");
-                    } else {
-                        System.out.println(tmp);
+        } else {
+            // it will throw exception if there don't have saved a repository file
+            Repository repo = Repository.load();
+            switch(firstArg) {
+                case "add":
+                    if (args.length != 2 || args[1] == null) {
+                        break;
                     }
-                }
-            case "status":
-                if (args.length != 1) {
+                    repo.add(args[1]);
+                // add new commit by using java gielet.Main commit "message"
+                case "commit":
+                    if (args.length != 2 || args[1] == null) {
+                        System.out.println("Please enter a commit message.");
+                        System.exit(0);
+                    } else {
+                        repo.commit(args[1]);
+                    }
+                case "rm":
+                    if (args.length != 2 || args[1] == null) {
+                        System.out.println("Please enter a commit message.");
+                        System.exit(0);
+                    } else {
+                        repo.remove(args[1]);
+                    }
+                case "log":
+                    if (args.length == 1) {
+                        repo.log();
+                    }
+                case "global-log":
+                    if (args.length == 1) {
+                        repo.globalLog();
+                    }
+                case "find":
+                    if (args.length != 2 || args[1] == null) {
+                        System.exit(0);
+                    } else{
+                        String tmp = repo.find(args[1]);
+                        if (tmp == null) {
+                            System.out.println("Found no commit with that message.");
+                        } else {
+                            System.out.println(tmp);
+                        }
+                    }
+                case "status":
+                    if (args.length != 1) {
+                        System.exit(0);
+                    } else {
+                        repo.status();
+                    }
+                case "checkout":
+                    // case 1 java gitlet.Main checkout -- [file name]
+                    // overwrite the file in CWD with the file in commit
+                    if (args.length == 3 && args[1].equals("--") && args[2] != null) {
+                        repo.overWriteWithSameFileName(args[2]);
+                    }
+                    // case 2 java gitlet.Main checkout [commit id] -- [file name]
+                    // overwrite the file with [file name] with the file in [commit id] the commit\
+                    // commit id could be
+                    else if (args.length == 4 && args[1] != null && args[2].equals("--") && args[3] != null) {
+                        repo.overWriteWithDifferentFileName(args[3], args[1]);
+                    }
+                    // case 3 java gitlet.Main checkout [branch name]
+                    // make the given branch became the current branch
+                    // overwrite the CWD entirely so that it's identical to that branch
+                    else if (args.length == 2 && args[1] != null) {
+                        repo.overWriteBranch(args[1]);
+                    }
+                case "branch":
+                    if (args.length != 2 || args[1] == null) {
+                        System.exit(0);
+                    }
+                    repo.branch(args[1]);
+                case "rm-branch":
+                    // java gitlet.Main rm-branch [branch name]
+                    // Deletes the branch with the given name. This only means to delete the pointer associated with the branch;
+                    // dont delete the committed content
+                    repo.removeBranch(args[1]);
+                case "reset":
+                    // java gitlet.Main reset [commit id]
+                    //  Checks out all the files tracked by the given commit.
+                    //  Removes tracked files that are not present in that commit.
+                    //  Also moves the current branch’s head to that commit node.
+                    if (args.length != 2 || args[1] == null) {
+                        System.exit(0);
+                    }
+                    repo.reset(args[1]);
+                case "merge":
+                    if (args.length != 2 || args[1] == null) {
+                        System.exit(0);
+                    }
+                    repo.merge(args[1]);
+                default:
+                    System.out.println("No command with that name exists.");
                     System.exit(0);
-                } else {
-                    repo.status();
                 }
-            case "checkout":
-                // case 1 java gitlet.Main checkout -- [file name]
-                // overwrite the file in CWD with the file in commit
-                if (args.length == 3 && args[1].equals("--") && args[2] != null) {
-                    repo.overWriteWithSameFileName(args[2]);
-                }
-                // case 2 java gitlet.Main checkout [commit id] -- [file name]
-                // overwrite the file with [file name] with the file in [commit id] the commit\
-                // commit id could be
-                else if (args.length == 4 && args[1] != null && args[2].equals("--") && args[3] != null) {
-                    repo.overWriteWithDifferentFileName(args[3], args[1]);
-                }
-                // case 3 java gitlet.Main checkout [branch name]
-                // make the given branch became the current branch
-                // overwrite the CWD entirely so that it's identical to that branch
-                else if (args.length == 2 && args[1] != null) {
-                    repo.overWriteBranch(args[1]);
-                }
-            case "branch":
-                if (args.length != 2 || args[1] == null) {
-                    System.exit(0);
-                }
-                repo.branch(args[1]);
-            case "rm-branch":
-                // java gitlet.Main rm-branch [branch name]
-                // Deletes the branch with the given name. This only means to delete the pointer associated with the branch;
-                // dont delete the committed content
-                repo.removeBranch(args[1]);
-            case "reset":
-                // java gitlet.Main reset [commit id]
-                //  Checks out all the files tracked by the given commit.
-                //  Removes tracked files that are not present in that commit.
-                //  Also moves the current branch’s head to that commit node.
-                if (args.length != 2 || args[1] == null) {
-                    System.exit(0);
-                }
-                repo.reset(args[1]);
-            case "merge":
-                if (args.length != 2 || args[1] == null) {
-                    System.exit(0);
-                }
-                repo.merge(args[1]);
-            default:
-                System.out.println("No command with that name exists.");
-                System.exit(0);
         }
     }
 }
