@@ -110,19 +110,22 @@ public class Repository implements Serializable {
     public void add(String filename) {
         // get the latest commit in master branch
         Commit currentCommit = Commit.getCommit(HEAD);
-        File f = new File(CWD, filename);
-        String comparisonResult = compare(filename, f, currentCommit.getContent());
+        File file = new File(CWD, filename);
+
+        String comparisonResult = compare(filename, file, currentCommit.getContent());
 
         Staging staging = Staging.load();
+        if (staging == null) {
+            staging = new Staging();
+        }
 
         if (comparisonResult != null) {
-            File file = new File(CWD, filename);
             Blobs newFileContent = new Blobs(readContentsAsString(file));
             newFileContent.save();
             staging.getAddition().put(filename, newFileContent.getBlobId());
             staging.save();
         } else {
-            if (staging != null && staging.getAddition().containsKey(filename)) {
+            if (staging.getAddition().containsKey(filename)) {
                 staging.getAddition().remove(filename);
                 staging.save();
             }
@@ -150,9 +153,7 @@ public class Repository implements Serializable {
         staging.save();
     }
 
-    /* compare the content in the second argument and the file with the first argument as its name in the third argument
-    * return null if the content in both files is identical,
-    * return str if it didn't exist in the third argument or have different content*/
+    /* return null only if the file is identical to the file name in previousCommit*/
     public static String compare(String filename, File file, HashMap<String, String> previousCommit) {
         if (!file.exists()) {
             System.out.println("File does not exist.");
@@ -161,18 +162,24 @@ public class Repository implements Serializable {
         if (previousCommit == null) {
             return filename + "(untracked)";
         }
+
         String currentFileContent = readContentsAsString(file);
         String previousBlobId = previousCommit.get(filename);
-        String previousFileContent = Blobs.getContent(previousBlobId);
-        if (previousFileContent == null) {
-            // if the given file name is not tracked (is not existed in the previous commit)
+
+        // If the file is not tracked in the previous commit
+        if (previousBlobId == null) {
             return filename + "(untracked)";
-        } else if (!currentFileContent.equals(previousFileContent)) {
-            // if the content in the given file has difference with the tracked file
-            return filename + "(modified)";
-        } else {
-            return null;
         }
+
+        String previousFileContent = Blobs.getContent(previousBlobId);
+
+        // If the previous file content is null or the contents differ
+        if (previousFileContent == null || !currentFileContent.equals(previousFileContent)) {
+            return filename + "(modified)";
+        }
+
+        // If the content is identical, return null
+        return null;
     }
 
     public String find(String message){
