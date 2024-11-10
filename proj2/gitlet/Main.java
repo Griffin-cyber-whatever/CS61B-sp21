@@ -31,6 +31,7 @@ public class Main {
                         break;
                     }
                     repo.add(args[1]);
+                    break;
                 // add new commit by using java gielet.Main commit "message"
                 case "commit":
                     if (args.length != 2 || args[1] == null) {
@@ -39,6 +40,7 @@ public class Main {
                     } else {
                         repo.commit(args[1]);
                     }
+                    break;
                 case "rm":
                     if (args.length != 2 || args[1] == null) {
                         System.out.println("Please enter a commit message.");
@@ -46,14 +48,17 @@ public class Main {
                     } else {
                         repo.remove(args[1]);
                     }
+                    break;
                 case "log":
                     if (args.length == 1) {
                         repo.log();
                     }
+                    break;
                 case "global-log":
                     if (args.length == 1) {
                         repo.globalLog();
                     }
+                    break;
                 case "find":
                     if (args.length != 2 || args[1] == null) {
                         System.exit(0);
@@ -65,12 +70,14 @@ public class Main {
                             System.out.println(tmp);
                         }
                     }
+                    break;
                 case "status":
                     if (args.length != 1) {
                         System.exit(0);
                     } else {
                         System.out.println(repo.status());
                     }
+                    break;
                 case "checkout":
                     // case 1 java gitlet.Main checkout -- [file name]
                     // overwrite the file in CWD with the file in commit
@@ -89,16 +96,19 @@ public class Main {
                     else if (args.length == 2 && args[1] != null) {
                         repo.overWriteBranch(args[1]);
                     }
+                    break;
                 case "branch":
                     if (args.length != 2 || args[1] == null) {
                         System.exit(0);
                     }
                     repo.branch(args[1]);
+                    break;
                 case "rm-branch":
                     // java gitlet.Main rm-branch [branch name]
                     // Deletes the branch with the given name. This only means to delete the pointer associated with the branch;
                     // dont delete the committed content
                     repo.removeBranch(args[1]);
+                    break;
                 case "reset":
                     // java gitlet.Main reset [commit id]
                     //  Checks out all the files tracked by the given commit.
@@ -108,11 +118,13 @@ public class Main {
                         System.exit(0);
                     }
                     repo.reset(args[1]);
+                    break;
                 case "merge":
                     if (args.length != 2 || args[1] == null) {
                         System.exit(0);
                     }
                     repo.merge(args[1]);
+                    break;
                 default:
                     System.out.println("No command with that name exists.");
                     System.exit(0);

@@ -57,6 +57,10 @@ public class Repository implements Serializable {
      * Initializes a new repository with a master branch and an initial commit.
      */
     public Repository() {
+        if (GITLET_DIR.exists()) {
+            System.out.println("A Gitlet version-control system already exists in the current directory.");
+            System.exit(0);
+        }
         Repository.setup();
         Commit init = new Commit();
         head.put("master", init.getHash());
@@ -528,7 +532,8 @@ public class Repository implements Serializable {
             visited.add(commit);
 
             // Enqueue parent commits
-            String parent = Commit.getParent(commit);
+            Commit n = Commit.getCommit(commit);
+            String parent = n.getParent();
             if (parent != null) {
                 queue.add(parent);
             }

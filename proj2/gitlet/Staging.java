@@ -39,5 +39,6 @@ public class Staging implements Serializable {
     public void clear() {
         addition.clear();
         deletion.clear();
+        save();
     }
 }

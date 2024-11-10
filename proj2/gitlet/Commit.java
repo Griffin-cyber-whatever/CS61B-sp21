@@ -49,10 +49,6 @@ public class Commit implements Serializable {
 
     // only use this constructor to initialize a repo
     public Commit() {
-        if (!empty()){
-            System.out.println("A Gitlet version-control system already exists in the current directory.");
-            System.exit(0);
-        }
         this.message = "initial commit";
         this.parent = null;
         this.secondParent = null;
@@ -62,12 +58,6 @@ public class Commit implements Serializable {
         commitFile = new File(commits, hashCode);
         save();
     }
-
-    // check if this directory is not initialized by checking if its log is empty
-    private boolean empty(){
-        return Repository.repositoryFile.exists();
-    }
-
 
     // Repository class will keep track on pointers so we don't have to worry about how to find its parent or the latest commit
     // in the branch now
@@ -122,14 +112,6 @@ public class Commit implements Serializable {
         return hashCode;
     }
 
-    public static String getParent(String commit){
-        Commit parent = Commit.getCommit(commit);
-        if (parent == null) {
-            return null;
-        }
-        return parent.getParent();
-    }
-
     public String getParent(){
         return parent;
     }
@@ -157,6 +139,9 @@ public class Commit implements Serializable {
 
     // get commit obj by providing its file name/ hash code
     public static Commit getCommit(String hash){
+        if (hash == null) {
+            return null;
+        }
         File obj = new File(commits, hash);
         if (!obj.exists()){
             return null;
