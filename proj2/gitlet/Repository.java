@@ -206,10 +206,12 @@ public class Repository implements Serializable {
         status.append("=== Branches ===" + "\n");
         String currentBranch = head.get("HEAD");
         for (String branch : head.keySet()) {
-            if (branch.equals(currentBranch)) {
-                status.append("*").append(branch).append("\n");
-            } else {
-                status.append(branch).append("\n");
+            if (!branch.equals("HEAD")) {
+                if (branch.equals(currentBranch)) {
+                    status.append("*").append(branch).append("\n");
+                } else {
+                    status.append(branch).append("\n");
+                }
             }
         }
 

@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.text.SimpleDateFormat;
+import  java.util.TimeZone;
 
 import static gitlet.Utils.*;
 
@@ -165,11 +167,12 @@ public class Commit implements Serializable {
 
     // generate a single block of commit log
     public String writeCommitLog(){
+        String formattedDate = formatTimestamp(this.timestamp);
         return String.format("===\n" +
                 "commit %s\n" +
                 "Date %s\n" +
                 "%s\n\n",
-                hashCode, timestamp, message);
+                hashCode, formattedDate, message);
     }
 
     // generate a single block of merge log
@@ -177,12 +180,13 @@ public class Commit implements Serializable {
     public String writeMergeLog(){
         String firstParent = this.parent.substring(0, 7);
         String secondParent = this.secondParent.substring(0, 7);
+        String formattedDate = formatTimestamp(this.timestamp);
         return String.format("===\n" +
                         "commit %s\n" +
                         "Merge %s %s\n" +
                         "Date %s\n" +
                         "%s\n\n",
-                hashCode, firstParent, secondParent, timestamp, message);
+                hashCode, firstParent, secondParent, formattedDate, message);
     }
 
     public String log(){
@@ -215,4 +219,14 @@ public class Commit implements Serializable {
         }
         return tmp.toString();
     }
+
+    // method to generate formatted timestamp
+    private String formatTimestamp(String timestamp) {
+        long epoch = Long.parseLong(timestamp);
+        Date date = new Date(epoch * 1000);  // Convert to milliseconds
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy Z");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT-8")); // Set the timezone (you can adjust as needed)
+        return dateFormat.format(date);
+    }
+
 }
