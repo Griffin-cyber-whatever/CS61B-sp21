@@ -95,9 +95,10 @@ public class Commit implements Serializable {
     // return the content for current commit which based on its parent content and the modification with staging area
     // will clear the staging area afterward
     public static HashMap<String, String> SetContent(Commit parentCommit) {
+        // will check if staging area is empty in Repository class
         Staging stagingArea = Staging.load();
         // initialize current content hashmap with its parent and then update it by checking the staging area content
-        HashMap<String, String> contentCopy = new HashMap<>(parentCommit.getContent());
+        HashMap<String, String> contentCopy = (parentCommit.getContent() != null) ? new HashMap<>(parentCommit.getContent()) : new HashMap<>();
 
         HashMap<String, String> additionalContent = stagingArea.getAddition();
         HashSet<String> removalContent = stagingArea.getDeletion();
@@ -123,6 +124,9 @@ public class Commit implements Serializable {
 
     public static String getParent(String commit){
         Commit parent = Commit.getCommit(commit);
+        if (parent == null) {
+            return null;
+        }
         return parent.getParent();
     }
 
@@ -140,9 +144,6 @@ public class Commit implements Serializable {
 
     public String getMessage(){
         return message;
-    }
-    public Commit load(File file){
-        return readObject(file, Commit.class);
     }
 
     // store each commit obj with hashCode as its file name must initialize commitFile first
@@ -179,12 +180,11 @@ public class Commit implements Serializable {
 
     // generate a single block of commit log
     public String writeCommitLog(){
-        String n = String.format("===\n" +
+        return String.format("===\n" +
                 "commit %s\n" +
                 "Date %s\n" +
                 "%s\n\n",
                 hashCode, timestamp, message);
-        return n;
     }
 
     // generate a single block of merge log
@@ -192,13 +192,12 @@ public class Commit implements Serializable {
     public String writeMergeLog(){
         String firstParent = this.parent.substring(0, 7);
         String secondParent = this.secondParent.substring(0, 7);
-        String n =  String.format("===\n" +
+        return String.format("===\n" +
                         "commit %s\n" +
                         "Merge %s %s\n" +
                         "Date %s\n" +
                         "%s\n\n",
                 hashCode, firstParent, secondParent, timestamp, message);
-        return n;
     }
 
     public String log(){
