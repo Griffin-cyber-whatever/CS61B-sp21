@@ -59,6 +59,7 @@ public class Commit implements Serializable {
         Date now = new Date();
         this.timestamp = String.valueOf((now.getTime()/1000));
         hashCode = sha1(message + timestamp);
+        commitFile = new File(commits, hashCode);
         save();
     }
 
@@ -88,7 +89,6 @@ public class Commit implements Serializable {
         // Calculate hash and initialize commit file after setting content
         hash();
         commitFile = new File(commits, hashCode);
-
         save();
     }
 
@@ -145,7 +145,7 @@ public class Commit implements Serializable {
         return readObject(file, Commit.class);
     }
 
-    // store each commit obj with hashCode as its file name
+    // store each commit obj with hashCode as its file name must initialize commitFile first
     public void save(){
         writeObject(commitFile, this);
     }
