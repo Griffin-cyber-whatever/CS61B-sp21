@@ -58,7 +58,7 @@ public class Commit implements Serializable {
         this.secondParent = null;
         Date now = new Date();
         this.timestamp = String.valueOf((now.getTime()/1000));
-        hash();
+        hashCode = sha1(message + timestamp);
         save();
     }
 
@@ -80,7 +80,7 @@ public class Commit implements Serializable {
         this.message = message;
         this.timestamp = LocalDateTime.now().toString();
         this.parent = parent;
-        this.secondParent = (parent == null) ? null : parentCommit.getParent();
+        this.secondParent = null;
 
         // Set the content based on parent commit and staging area
         content = SetContent(parentCommit);

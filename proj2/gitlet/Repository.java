@@ -440,7 +440,8 @@ public class Repository implements Serializable {
             }
         }
         String mergeLog = String.format("Merged %s into %s.", branch, head.get("HEAD"));
-        commit(mergeLog);
+        Commit merged = new Commit(mergeLog, HEAD);
+        merged.setSecondParent(branchId);
     }
 
     // Helper method to check out and stage a file
