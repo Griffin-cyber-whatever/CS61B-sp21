@@ -62,6 +62,8 @@ public class Repository implements Serializable {
         head.put("master", init.getHash());
         head.put("HEAD", "master");
         HEAD = init.getHash();
+        Staging staging = new Staging();
+        staging.save();
         save();
     }
 
