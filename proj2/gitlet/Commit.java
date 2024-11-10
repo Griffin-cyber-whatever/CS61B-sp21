@@ -61,12 +61,10 @@ public class Commit implements Serializable {
         hash();
         save();
     }
+
     // check if this directory is not initialized by checking if its log is empty
     private boolean empty(){
-        // TODO
-        //File log = new File(Repository.log, "log.txt");
-        //String oldlog = readContentsAsString(log);
-        return false;
+        return Repository.repositoryFile.exists();
     }
 
 

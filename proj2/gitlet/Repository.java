@@ -17,7 +17,6 @@ import static gitlet.Utils.*;
  *      - commits/ -- folder containing all of the preivous commits
  *      - blobs/ -- folder containing all of the previous blob whose file name is their blobId
  *      - staging -- file containg the staging area object
- *      - log.txt -- file containing the log
  *      - repository -- file containg the repository object
  */
 
@@ -56,11 +55,34 @@ public class Repository implements Serializable {
      * Initializes a new repository with a master branch and an initial commit.
      */
     public Repository() {
+        Repository.setup();
         Commit init = new Commit();
         head.put("master", init.getHash());
         head.put("HEAD", "master");
         HEAD = init.getHash();
         save();
+    }
+
+    private static void setup() {
+        try {
+            if (!GITLET_DIR.exists()) {
+                repositoryFile.mkdir();
+            }
+            if (!Blobs.blobs.exists()) {
+                Blobs.blobs.mkdir();
+            }
+            if (!Commit.commits.exists()) {
+                Commit.commits.mkdir();
+            }
+            if (!repositoryFile.exists()) {
+                repositoryFile.createNewFile();
+            }
+            if (!Staging.StagingArea.exists()) {
+                Staging.StagingArea.createNewFile();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /* add new commit to the given branch
