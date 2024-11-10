@@ -167,6 +167,9 @@ public class Commit implements Serializable {
     // return the content of that file in the current commit
     public String getFileContent(String filename){
         String tmp = null;
+        if (content == null){
+            return null;
+        }
         String hash = content.get(filename);
         if (hash != null){
             tmp = Blobs.getContent(hash);

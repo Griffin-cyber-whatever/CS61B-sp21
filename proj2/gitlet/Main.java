@@ -69,7 +69,7 @@ public class Main {
                     if (args.length != 1) {
                         System.exit(0);
                     } else {
-                        repo.status();
+                        System.out.println(repo.status());
                     }
                 case "checkout":
                     // case 1 java gitlet.Main checkout -- [file name]

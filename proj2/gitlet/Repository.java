@@ -148,6 +148,9 @@ public class Repository implements Serializable {
             System.out.println("File does not exist.");
             System.exit(0);
         }
+        if (previousCommit == null) {
+            return filename + "(untracked)";
+        }
         String currentFileContent = readContentsAsString(file);
         String previousBlobId = previousCommit.get(filename);
         String previousFileContent = Blobs.getContent(previousBlobId);
@@ -183,20 +186,20 @@ public class Repository implements Serializable {
         String currentBranch = head.get("HEAD");
         for (String branch : head.keySet()) {
             if (branch.equals(currentBranch)) {
-                status.append("*" + branch + "\n");
+                status.append("*").append(branch).append("\n");
             } else {
-                status.append(branch + "\n");
+                status.append(branch).append("\n");
             }
         }
 
         status.append("\n=== Staged Files ===" + "\n");
         for (String addition : staging.getAddition().keySet()) {
-            status.append(addition + "\n");
+            status.append(addition).append("\n");
         }
 
         status.append("\n=== Removed Files ===" + "\n");
         for (String deletion : staging.getDeletion()) {
-            status.append(deletion + "\n");
+            status.append(deletion).append("\n");
         }
 
         List<String> untracked = new ArrayList<String>();
@@ -209,7 +212,7 @@ public class Repository implements Serializable {
             // Case 1: File is tracked but deleted in the working directory (not staged for removal)
             // exist in the future but not exist in the CWD
             if (future.containsKey(file) && !currentFile.exists() && !staging.getDeletion().contains(file)) {
-                status.append(file + " (deleted)\n");
+                status.append(file).append(" (deleted)\n");
             }
             // Case 2: File is modified but not staged
             else if (future.containsKey(file)) {
@@ -255,7 +258,7 @@ public class Repository implements Serializable {
     }
 
     public void overWriteWithSameFileName(String filename) {
-        Boolean tmp = overWrite(filename, filename, HEAD);
+        boolean tmp = overWrite(filename, filename, HEAD);
         if (!tmp) {
             System.out.println("File does not exist in that commit. ");
             System.exit(0);
@@ -263,7 +266,7 @@ public class Repository implements Serializable {
     }
 
     public void overWriteWithDifferentFileName(String filename, String commitName) {
-        Boolean tmp = overWrite(filename, commitName, HEAD);
+        boolean tmp = overWrite(filename, commitName, HEAD);
         if (!tmp){
             System.out.println("No commit with that id exists.");
             System.exit(0);
@@ -296,17 +299,19 @@ public class Repository implements Serializable {
     private void overWriteCWD(String commitId) {
         // Get the current commit and the target branch commit
         String currentCommitId = HEAD;
-        Commit currentCommit = Commit.getCommit(currentCommitId);
         Commit targetCommit = Commit.getCommit(commitId);
 
         // Get content maps for both the current and target branch commits
-        HashMap<String, String> currentContent = currentCommit.getContent();
         HashMap<String, String> branchContent = targetCommit.getContent();
 
         // Check for untracked files in the working directory that would be overwritten
         untrackedFileExists();
 
         clearDirectory();
+
+        if (branchContent == null){
+            return;
+        }
 
         for (String filename : branchContent.keySet()) {
             File currentFile = new File(CWD, filename);
@@ -414,16 +419,15 @@ public class Repository implements Serializable {
 
         // Traverse through all files from current, given, and split point.
         Set<String> allFiles = new HashSet<>();
-        allFiles.addAll(currentContent.keySet());
-        allFiles.addAll(branchContent.keySet());
-        allFiles.addAll(splitContent.keySet());
-
+            allFiles.addAll(currentContent.keySet());
+            allFiles.addAll(branchContent.keySet());
+            allFiles.addAll(splitContent.keySet());
         // Handle each file based on its status in the three commits.
         for (String file : allFiles) {
             // each file has its unique blob id, so we don't need to check its content
-            String splitBlob = splitContent.get(file);
-            String currentBlob = currentContent.get(file);
-            String branchBlob = branchContent.get(file);
+            String splitBlob = splitContent.getOrDefault(file, null);
+            String currentBlob = currentContent.getOrDefault(file, null);
+            String branchBlob = branchContent.getOrDefault(file, null);
 
             if (splitBlob == null && branchBlob != null && currentBlob == null) {
                 // (1) File only in given branch (new file)
@@ -533,6 +537,9 @@ public class Repository implements Serializable {
     // clear entire CWD except .git
     private void clearDirectory(){
         List<String> files = plainFilenamesIn(CWD);
+        if (files == null){
+            return;
+        }
         for (String file : files) {
             File f = new File(file);
             if (!file.equals(".git")){
