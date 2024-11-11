@@ -512,7 +512,7 @@ public class Repository implements Serializable {
             // and absent in the given branch
             // Main issue:
             // it will evaluate as the same as splitBlob != null && currentBlob.equals(splitBlob) && !splitBlob.equals(branchBlob)
-            else if (splitBlob != null && branchBlob == null && currentBlob.equals(splitBlob)) {
+            else if (splitBlob != null && currentBlob != null && branchBlob == null && currentBlob.equals(splitBlob)) {
                 removeFile(file);
             }
 
