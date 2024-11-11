@@ -157,7 +157,7 @@ public class Repository implements Serializable {
             staging.getAddition().remove(filename);
             // If the file is tracked in the current commit
             // stage it for removal and remove the file from the working directory if the user has not already done so
-        } else if (n.containsKey(filename)) {
+        } else if (n != null && n.containsKey(filename)) {
             staging.getDeletion().add(filename);
             File f = new File(CWD, filename);
             restrictedDelete(f);
@@ -364,7 +364,7 @@ public class Repository implements Serializable {
         for (String file : files) {
             if (!currentContent.containsKey(file)) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-                return;
+                System.exit(0);
             }
         }
     }
