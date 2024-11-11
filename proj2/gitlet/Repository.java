@@ -370,12 +370,12 @@ public class Repository implements Serializable {
     }
 
     //  Creates a new branch with the given name, and points it at the current head commit.
+    // it will not change which branch that HEAD currently in, checkout [branch name] will deal with it
     public void branch(String newBranch) {
         if (head.containsKey(newBranch)) {
             System.out.println("Branch already exists.");
             return;
         }
-        head.put("HEAD", newBranch);
         head.put(newBranch, HEAD);
         save();
     }

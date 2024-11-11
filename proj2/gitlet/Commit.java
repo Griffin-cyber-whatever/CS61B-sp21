@@ -142,10 +142,10 @@ public class Commit implements Serializable {
     // get commit obj by providing its file name/ commit hash code
     // return null if the file didn't that commit didn't exist
     public static Commit getCommit(String hash){
-        if (hash == null) {
+        if (hash == null || hash.length() < 6) {
             return null;
         }
-        String abbreviated = hash.substring(0,6);
+        String abbreviated = hash.substring(0, 6);
         List<String> commitFiles = plainFilenamesIn(commits);
         if (commitFiles == null || commitFiles.isEmpty()) {
             return null;
@@ -153,7 +153,7 @@ public class Commit implements Serializable {
         for (String commitFile : commitFiles) {
             String tmp = commitFile.substring(0,6);
             if (tmp.equals(abbreviated) || commitFile.equals(hash)) {
-                File obj = new File(commits, hash);
+                File obj = new File(commits, commitFile);
                 return readObject(obj, Commit.class);
             }
         }
