@@ -359,10 +359,13 @@ public class Repository implements Serializable {
 
     private void untrackedFileExists(){
         List<String> files = plainFilenamesIn(CWD);
+        if (files == null || files.isEmpty()) {
+            return;
+        }
         Commit currentCommit = Commit.getCommit(HEAD);
         HashMap<String, String> currentContent = currentCommit.getContent();
         for (String file : files) {
-            if (!currentContent.containsKey(file)) {
+            if (currentContent.isEmpty() || !currentContent.containsKey(file)) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 System.exit(0);
             }
@@ -373,7 +376,7 @@ public class Repository implements Serializable {
     // it will not change which branch that HEAD currently in, checkout [branch name] will deal with it
     public void branch(String newBranch) {
         if (head.containsKey(newBranch)) {
-            System.out.println("Branch already exists.");
+            System.out.println("A branch with that name already exists.");
             return;
         }
         head.put(newBranch, HEAD);
