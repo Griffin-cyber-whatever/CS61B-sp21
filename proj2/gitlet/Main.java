@@ -87,7 +87,7 @@ public class Main {
                     // case 2 java gitlet.Main checkout [commit id] -- [file name]
                     // overwrite the file with [file name] with the file in [commit id] the commit\
                     // commit id could be
-                    else if (args.length == 4 && args[1] != null && args[2].equals("--") && args[3] != null && !args[3].isEmpty()) {
+                    else if (args.length == 4 && args[1] != null && !args[1].isEmpty() && args[2].equals("--") && args[3] != null && !args[3].isEmpty()) {
                         repo.overWriteWithDifferentFileName(args[3], args[1]);
                     }
                     // case 3 java gitlet.Main checkout [branch name]
@@ -95,6 +95,8 @@ public class Main {
                     // overwrite the CWD entirely so that it's identical to that branch
                     else if (args.length == 2 && args[1] != null && !args[1].isEmpty()) {
                         repo.overWriteBranch(args[1]);
+                    } else {
+                        System.out.println("Incorrect operands.");
                     }
                     break;
                 case "branch":
