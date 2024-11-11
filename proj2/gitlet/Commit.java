@@ -143,7 +143,8 @@ public class Commit implements Serializable {
         return content;
     }
 
-    // get commit obj by providing its file name/ hash code
+    // get commit obj by providing its file name/ commit hash code
+    // return null if the file didn't that commit didn't exist
     public static Commit getCommit(String hash){
         if (hash == null) {
             return null;
@@ -157,6 +158,7 @@ public class Commit implements Serializable {
 
 
     // return the content of that file in the current commit
+    // return null if the file didn't exist in that commit
     public String getFileContent(String filename){
         String tmp = null;
         if (content == null){

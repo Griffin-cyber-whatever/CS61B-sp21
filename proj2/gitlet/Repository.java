@@ -90,7 +90,7 @@ public class Repository implements Serializable {
     * If no files have been staged, abort. Print the message No changes added to the commit.*/
     // TODO potential risk if u want to detached HEAD while current implementation works fine for attaching new commit to the
     //  previous commit without changing branch
-    public void commit(String message){
+    public Commit commit(String message){
         if (emptyStagingArea()){
             System.out.println("No changes added to the commit.");
             System.exit(0);
@@ -107,6 +107,7 @@ public class Repository implements Serializable {
         stagingArea.clear();
         stagingArea.save();
         save();
+        return commit;
     }
 
     // stage the new version of that file if content in CWD and the latest commit has different
@@ -272,9 +273,16 @@ public class Repository implements Serializable {
     // only returns false if that filename didn't exist in that commit
     private boolean overWrite(String filename, String commit) {
         // get the file content in that commit
-        String previousContent = Commit.getCommit(commit).getFileContent(filename);
+        Commit previousCommit = Commit.getCommit(commit);
+        if (previousCommit == null) {
+            System.out.println("No commit with that id exists. ");
+            System.exit(0);
+        }
+
+        String previousContent = previousCommit.getFileContent(filename);
         if (previousContent == null) {
-            return false;
+            System.out.println("File does not exist in that commit. ");
+            System.exit(0);
         }
         // overWrite the file in CWD if the file exists, otherwise put it in the CWD
         File file = new File(CWD, filename);
@@ -284,19 +292,11 @@ public class Repository implements Serializable {
 
     public void overWriteWithSameFileName(String filename) {
         boolean tmp = overWrite(filename, HEAD);
-        if (!tmp) {
-            System.out.println("File does not exist in that commit. ");
-            System.exit(0);
-        }
     }
 
     // takes the version of the file with file name in that commit
     public void overWriteWithDifferentFileName(String filename, String commitName) {
         boolean tmp = overWrite(filename,  commitName);
-        if (!tmp){
-            System.out.println("No commit with that id exists.");
-            System.exit(0);
-        }
     }
 
     // set CWD with the latest commit in that branch and set HEAD to that branch
@@ -324,7 +324,6 @@ public class Repository implements Serializable {
     // overwrite CWD with the given commit will exit if CWD have untracked files
     private void overWriteCWD(String commitId) {
         // Get the current commit and the target branch commit
-        String currentCommitId = HEAD;
         Commit targetCommit = Commit.getCommit(commitId);
 
         // Get content maps for both the current and target branch commits
@@ -393,11 +392,14 @@ public class Repository implements Serializable {
         Commit commit = Commit.getCommit(commitId);
         if (commit == null) {
             System.out.println("No commit with that id exists.");
+            return;
         }
         overWriteCWD(commitId);
-        // TODO update the branch of reset HEAD
 
         HEAD = commitId;
+        String currentBranch = head.get("HEAD");
+        head.put(currentBranch, commitId);
+
         // clear the staging area
         Staging staging = Staging.load();
         staging.clear();
@@ -415,8 +417,7 @@ public class Repository implements Serializable {
        (2) Only in given branch
        (3) Unmodified in current, removed in given*/
     public void merge(String branch) {
-        // Find the split point (latest common ancestor).
-        String split = getAncestor(HEAD, branch);
+        // Find the split point (the latest common ancestor).
         String branchId = head.get(branch);
 
         if (!emptyStagingArea()){
@@ -432,6 +433,9 @@ public class Repository implements Serializable {
             System.out.println("Cannot merge a branch with itself.");
             return;
         }
+
+        String split = getAncestor(HEAD, branchId);
+
         // Handle ancestor cases.
         if (split.equals(branchId)) {
             System.out.println("Given branch is an ancestor of the current branch.");
@@ -474,8 +478,9 @@ public class Repository implements Serializable {
             }
         }
         String mergeLog = String.format("Merged %s into %s.", branch, head.get("HEAD"));
-        Commit merged = new Commit(mergeLog, HEAD);
+        Commit merged = commit(mergeLog);
         merged.setSecondParent(branchId);
+        merged.save();
     }
 
     // Helper method to check out and stage a file
@@ -542,9 +547,11 @@ public class Repository implements Serializable {
 
             // Enqueue parent commits
             Commit n = Commit.getCommit(commit);
-            String parent = n.getParent();
-            if (parent != null) {
-                queue.add(parent);
+            if (n != null) {
+                String parent = n.getParent();
+                if (parent != null) {
+                    queue.add(parent);
+                }
             }
         }
 

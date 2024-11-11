@@ -1,0 +1,11 @@
+<<<<<<< HEAD
+This is a wug...
+
+test for merge, and this is the second commit in master branch
+
+=======
+This is a wug!!!
+
+test for merge, and this is the second commit in "branch" branch
+
+>>>>>>>
