@@ -73,7 +73,7 @@ public class Commit implements Serializable {
 
         // Set the content based on parent commit and staging area
         content = SetContent(parentCommit);
-        
+
         // Calculate hash and initialize commit file after setting content
         hash();
         commitFile = new File(commits, hashCode);
@@ -191,7 +191,7 @@ public class Commit implements Serializable {
         String secondParent = this.secondParent.substring(0, 7);
         return String.format("===\n" +
                         "commit %s\n" +
-                        "Merge %s %s\n" +
+                        "Merge: %s %s\n" +
                         "Date: %s\n" +
                         "%s\n\n",
                 hashCode, firstParent, secondParent, timestamp, message);
