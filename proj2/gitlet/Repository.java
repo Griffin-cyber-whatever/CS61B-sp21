@@ -99,7 +99,7 @@ public class Repository implements Serializable {
         // there might have multiple pointers that point to the same commit,
         // but we will only check which HEAD will point at
         String currentBranch = head.get("HEAD");
-        Commit commit = new Commit(message, head.get(currentBranch));
+        Commit commit = new Commit(message, HEAD);
         head.put(currentBranch, commit.getHash());
         HEAD = commit.getHash();
         // Clear the staging area after a successful commit
@@ -467,6 +467,10 @@ public class Repository implements Serializable {
             String currentBlob = currentContent.getOrDefault(file, null);
             String branchBlob = branchContent.getOrDefault(file, null);
 
+            System.out.println(String.format("%s in split is %s", file, splitBlob == null?  " " : splitBlob));
+            System.out.println(String.format("%s in branch is %s", file, branchBlob == null?  " " : branchBlob));
+            System.out.println(String.format("%s in current is %s", file, currentBlob == null?  " " : currentBlob));
+
             // Requirement 1: File present only in the given branch, not in split point or current branch
             if (splitBlob == null && branchBlob != null && currentBlob == null) {
                 checkOutAndStage(file, branchBlob);
@@ -479,7 +483,7 @@ public class Repository implements Serializable {
             // and absent in the given branch
             // Main issue:
             // it will evaluate as the same as splitBlob != null && currentBlob.equals(splitBlob) && !splitBlob.equals(branchBlob)
-            else if (splitBlob != null && currentBlob.equals(splitBlob) && branchBlob == null) {
+            else if (splitBlob != null && currentBlob != null && branchBlob == null && currentBlob.equals(splitBlob) ) {
                 removeFile(file);
             }
             // Requirement 9: File modified differently in the current and given branches (conflict)
