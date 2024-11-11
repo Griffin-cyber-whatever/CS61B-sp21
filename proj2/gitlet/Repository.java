@@ -409,9 +409,9 @@ public class Repository implements Serializable {
         }
         overWriteCWD(commitId);
 
-        HEAD = commitId;
+        HEAD = getFullCommitName(commitId);
         String currentBranch = head.get("HEAD");
-        head.put(currentBranch, commitId);
+        head.put(currentBranch, HEAD);
 
         // clear the staging area
         Staging staging = Staging.load();
@@ -419,6 +419,18 @@ public class Repository implements Serializable {
         save();
     }
 
+    private String getFullCommitName(String commitId) {
+        List<String> files = plainFilenamesIn(Commit.commits);
+        for (String filename : files) {
+            String tmp = filename.substring(0, 6);
+            if (filename.equals(commitId) || tmp.equals(commitId)) {
+                return filename;
+            }
+        }
+        System.out.println("No such commit exists. error occurs in getFullCommitName.");
+        System.exit(0);
+        return commitId;
+    }
 
     public void merge(String branch) {
         // Find the split point (the latest common ancestor).
@@ -467,10 +479,6 @@ public class Repository implements Serializable {
             String currentBlob = currentContent.getOrDefault(file, null);
             String branchBlob = branchContent.getOrDefault(file, null);
 
-            System.out.println(String.format("%s in split is %s", file, splitBlob == null?  " " : splitBlob));
-            System.out.println(String.format("%s in branch is %s", file, branchBlob == null?  " " : branchBlob));
-            System.out.println(String.format("%s in current is %s", file, currentBlob == null?  " " : currentBlob));
-
             // Requirement 1: File present only in the given branch, not in split point or current branch
             if (splitBlob == null && branchBlob != null && currentBlob == null) {
                 checkOutAndStage(file, branchBlob);
@@ -494,7 +502,6 @@ public class Repository implements Serializable {
         String mergeLog = String.format("Merged %s into %s.", branch, head.get("HEAD"));
         Commit merged = commit(mergeLog);
         merged.setSecondParent(branchId);
-        merged.save();
     }
 
     // Helper method to check out and stage a file

@@ -3,11 +3,7 @@ package gitlet;
 // TODO: any imports you need here
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.text.SimpleDateFormat;
 
@@ -77,7 +73,7 @@ public class Commit implements Serializable {
 
         // Set the content based on parent commit and staging area
         content = SetContent(parentCommit);
-
+        
         // Calculate hash and initialize commit file after setting content
         hash();
         commitFile = new File(commits, hashCode);
@@ -96,11 +92,14 @@ public class Commit implements Serializable {
         HashSet<String> removalContent = stagingArea.getDeletion();
 
         // Update content with additions and handle deletions
-        for (String fileName : additionalContent.keySet()) {
-            if (!removalContent.contains(fileName)) {
-                contentCopy.put(fileName, additionalContent.get(fileName));
-            }
+        for (String key : additionalContent.keySet()) {
+            contentCopy.put(key, additionalContent.get(key));
         }
+
+        for (String key : removalContent) {
+            contentCopy.remove(key);
+        }
+
         return contentCopy;
     }
 
@@ -124,6 +123,7 @@ public class Commit implements Serializable {
 
     public void setSecondParent(String secondParent){
         this.secondParent = secondParent;
+        save();
     }
 
     public String getMessage(){
