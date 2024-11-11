@@ -472,12 +472,14 @@ public class Repository implements Serializable {
                 checkOutAndStage(file, branchBlob);
             }
             // Requirement 2: File modified in the given branch since split point, unmodified in the current branch
-            else if (splitBlob != null && !splitBlob.equals(branchBlob) && splitBlob.equals(currentBlob)) {
+            else if (splitBlob != null && currentBlob != null && branchBlob != null && currentBlob.equals(splitBlob) && !splitBlob.equals(branchBlob)) {
                 checkOutAndStage(file, branchBlob);
             }
             // Requirement 7: File present at split point, unmodified in the current branch,
             // and absent in the given branch
-            else if (splitBlob != null && splitBlob.equals(currentBlob) && branchBlob == null) {
+            // Main issue:
+            // it will evaluate as the same as splitBlob != null && currentBlob.equals(splitBlob) && !splitBlob.equals(branchBlob)
+            else if (splitBlob != null && currentBlob.equals(splitBlob) && branchBlob == null) {
                 removeFile(file);
             }
             // Requirement 9: File modified differently in the current and given branches (conflict)
