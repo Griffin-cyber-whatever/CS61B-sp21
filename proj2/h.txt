@@ -1,9 +1,0 @@
-<<<<<<< HEAD
-Another wug.
-
-this is branch master
-=======
-this is not a wug
-
-in aTest branch
->>>>>>>

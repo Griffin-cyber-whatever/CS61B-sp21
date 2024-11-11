@@ -495,8 +495,13 @@ public class Repository implements Serializable {
             String currentBlob = currentContent.getOrDefault(file, null);
             String branchBlob = branchContent.getOrDefault(file, null);
 
+            // Requirement 9: File modified differently in the current and given branches (conflict)
+            if ( splitBlob != null && (currentBlob != null || branchBlob != null)  && !splitBlob.equals(currentBlob) && !splitBlob.equals(branchBlob)
+                && !Objects.equals(currentBlob, branchBlob)) {
+                handleConflict(file, currentBlob, branchBlob);
+            }
             // Requirement 1: File present only in the given branch, not in split point or current branch
-            if (splitBlob == null && branchBlob != null && currentBlob == null) {
+            else if (splitBlob == null && branchBlob != null && currentBlob == null) {
                 checkOutAndStage(file, branchBlob);
             }
             // Requirement 2: File modified in the given branch since split point, unmodified in the current branch
@@ -507,14 +512,10 @@ public class Repository implements Serializable {
             // and absent in the given branch
             // Main issue:
             // it will evaluate as the same as splitBlob != null && currentBlob.equals(splitBlob) && !splitBlob.equals(branchBlob)
-            else if (splitBlob != null && currentBlob != null && branchBlob == null && currentBlob.equals(splitBlob) ) {
+            else if (splitBlob != null && branchBlob == null && currentBlob.equals(splitBlob)) {
                 removeFile(file);
             }
-            // Requirement 9: File modified differently in the current and given branches (conflict)
-            else if ( (splitBlob != null && currentBlob != null && !splitBlob.equals(currentBlob) && !splitBlob.equals(branchBlob)) ||
-                     (splitBlob != null && branchBlob != null && !splitBlob.equals(branchBlob) && !splitBlob.equals(currentBlob))) {
-                handleConflict(file, currentBlob, branchBlob);
-            }
+
         }
         String mergeLog = String.format("Merged %s into %s.", branch, head.get("HEAD"));
         Commit merged = commit(mergeLog);
