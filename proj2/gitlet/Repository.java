@@ -365,7 +365,7 @@ public class Repository implements Serializable {
         Commit currentCommit = Commit.getCommit(HEAD);
         HashMap<String, String> currentContent = currentCommit.getContent();
         for (String file : files) {
-            if (currentContent.isEmpty() || !currentContent.containsKey(file)) {
+            if ( currentContent == null ||  currentContent.isEmpty() || !currentContent.containsKey(file)) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 System.exit(0);
             }
@@ -467,21 +467,22 @@ public class Repository implements Serializable {
             String currentBlob = currentContent.getOrDefault(file, null);
             String branchBlob = branchContent.getOrDefault(file, null);
 
+            // Requirement 1: File present only in the given branch, not in split point or current branch
             if (splitBlob == null && branchBlob != null && currentBlob == null) {
-                // (5) File only in given branch (new file)
                 checkOutAndStage(file, branchBlob);
-            } else if (splitBlob != null && splitBlob.equals(branchBlob) && currentBlob == null) {
-                // (7) File removed in current branch, unmodified in given branch
+            }
+            // Requirement 2: File modified in the given branch since split point, unmodified in the current branch
+            else if (splitBlob != null && !splitBlob.equals(branchBlob) && splitBlob.equals(currentBlob)) {
+                checkOutAndStage(file, branchBlob);
+            }
+            // Requirement 7: File present at split point, unmodified in the current branch,
+            // and absent in the given branch
+            else if (splitBlob != null && splitBlob.equals(currentBlob) && branchBlob == null) {
                 removeFile(file);
-            } else if (splitBlob != null && !splitBlob.equals(branchBlob) && splitBlob.equals(currentBlob)) {
-                // (1) File modified in the given branch, not modified in the current branch
-                checkOutAndStage(file, branchBlob);
-            } else if (splitBlob != null && !splitBlob.equals(currentBlob) && !splitBlob.equals(branchBlob) && !currentBlob.equals(branchBlob)) {
-                // (8) Conflict: file modified differently in both branches
+            }
+            // Requirement 9: File modified differently in the current and given branches (conflict)
+            else if (splitBlob != null && !splitBlob.equals(currentBlob) && !splitBlob.equals(branchBlob) && !currentBlob.equals(branchBlob)) {
                 handleConflict(file, currentBlob, branchBlob);
-            } else if (splitBlob != null && splitBlob.equals(currentBlob) && branchBlob == null) {
-                // (6) File removed in the given branch, unmodified in the current branch
-                removeFile(file);
             }
         }
         String mergeLog = String.format("Merged %s into %s.", branch, head.get("HEAD"));
