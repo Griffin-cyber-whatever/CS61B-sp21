@@ -8,12 +8,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.text.SimpleDateFormat;
-import  java.util.TimeZone;
 
 import static gitlet.Utils.*;
 
@@ -149,11 +145,19 @@ public class Commit implements Serializable {
         if (hash == null) {
             return null;
         }
-        File obj = new File(commits, hash);
-        if (!obj.exists()){
+        String abbreviated = hash.substring(0,6);
+        List<String> commitFiles = plainFilenamesIn(commits);
+        if (commitFiles == null || commitFiles.isEmpty()) {
             return null;
         }
-        return readObject(obj, Commit.class);
+        for (String commitFile : commitFiles) {
+            String tmp = commitFile.substring(0,6);
+            if (tmp.equals(abbreviated) || commitFile.equals(hash)) {
+                File obj = new File(commits, hash);
+                return readObject(obj, Commit.class);
+            }
+        }
+        return null;
     }
 
 
