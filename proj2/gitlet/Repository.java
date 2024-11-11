@@ -419,16 +419,7 @@ public class Repository implements Serializable {
         save();
     }
 
-    /* base is the current, so condition like
-       (1) Modified in current branch, not modified in given
-       (2) Modified in both branches, same content
-       (3) Only in current branch
-       (4) Unmodified in given, removed in current
-       will be ignored
-       and the conditions we care is following
-       (1) Modified in given branch, not modified in current
-       (2) Only in given branch
-       (3) Unmodified in current, removed in given*/
+
     public void merge(String branch) {
         // Find the split point (the latest common ancestor).
         String branchId = head.get(branch);
@@ -477,17 +468,20 @@ public class Repository implements Serializable {
             String branchBlob = branchContent.getOrDefault(file, null);
 
             if (splitBlob == null && branchBlob != null && currentBlob == null) {
-                // (1) File only in given branch (new file)
+                // (5) File only in given branch (new file)
                 checkOutAndStage(file, branchBlob);
-            } else if (splitBlob != null && branchBlob != null && splitBlob.equals(branchBlob) && currentBlob == null) {
-                // (2) File removed in current, unmodified in given
+            } else if (splitBlob != null && splitBlob.equals(branchBlob) && currentBlob == null) {
+                // (7) File removed in current branch, unmodified in given branch
                 removeFile(file);
             } else if (splitBlob != null && !splitBlob.equals(branchBlob) && splitBlob.equals(currentBlob)) {
-                // (3) Modified in given branch, not modified in current
+                // (1) File modified in the given branch, not modified in the current branch
                 checkOutAndStage(file, branchBlob);
             } else if (splitBlob != null && !splitBlob.equals(currentBlob) && !splitBlob.equals(branchBlob) && !currentBlob.equals(branchBlob)) {
-                // (4) Conflict: modified in both branches differently
+                // (8) Conflict: file modified differently in both branches
                 handleConflict(file, currentBlob, branchBlob);
+            } else if (splitBlob != null && splitBlob.equals(currentBlob) && branchBlob == null) {
+                // (6) File removed in the given branch, unmodified in the current branch
+                removeFile(file);
             }
         }
         String mergeLog = String.format("Merged %s into %s.", branch, head.get("HEAD"));
