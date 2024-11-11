@@ -117,12 +117,18 @@ public class Repository implements Serializable {
         Commit currentCommit = Commit.getCommit(HEAD);
         File file = new File(CWD, filename);
 
-        String comparisonResult = compare(filename, file, currentCommit.getContent());
-
         Staging staging = Staging.load();
         if (staging == null) {
             staging = new Staging();
         }
+
+        if (staging.getDeletion().contains(filename)) {
+            staging.getDeletion().remove(filename);
+            staging.save();
+            return;
+        }
+
+        String comparisonResult = compare(filename, file, currentCommit.getContent());
 
         if (comparisonResult != null) {
             Blobs newFileContent = new Blobs(readContentsAsString(file));
@@ -142,6 +148,10 @@ public class Repository implements Serializable {
         Commit tmp = Commit.getCommit(HEAD);
         HashMap<String, String> n = tmp.getContent();
         Staging staging = Staging.load();
+
+        if (staging == null) {
+            staging = new Staging();
+        }
         // if it is currently staged for addition
         if (staging.getAddition().containsKey(filename)) {
             staging.getAddition().remove(filename);
