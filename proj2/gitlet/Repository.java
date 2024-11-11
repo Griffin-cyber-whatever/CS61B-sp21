@@ -479,10 +479,15 @@ public class Repository implements Serializable {
         HashMap<String, String> splitContent = Commit.getCommit(split).getContent();
 
         // Traverse through all files from current, given, and split point.
+        currentContent = (currentContent != null) ? currentContent : new HashMap<>();
+        branchContent = (branchContent != null) ? branchContent : new HashMap<>();
+        splitContent = (splitContent != null) ? splitContent : new HashMap<>();
+        
         Set<String> allFiles = new HashSet<>();
-            allFiles.addAll(currentContent.keySet());
-            allFiles.addAll(branchContent.keySet());
-            allFiles.addAll(splitContent.keySet());
+        allFiles.addAll(currentContent.keySet());
+        allFiles.addAll(branchContent.keySet());
+        allFiles.addAll(splitContent.keySet());
+
         // Handle each file based on its status in the three commits.
         for (String file : allFiles) {
             // each file has its unique blob id, so we don't need to check its content
@@ -506,7 +511,8 @@ public class Repository implements Serializable {
                 removeFile(file);
             }
             // Requirement 9: File modified differently in the current and given branches (conflict)
-            else if (splitBlob != null && !splitBlob.equals(currentBlob) && !splitBlob.equals(branchBlob) && !currentBlob.equals(branchBlob)) {
+            else if (splitBlob != null && currentBlob != null && branchBlob != null &&
+                    !splitBlob.equals(currentBlob) && !splitBlob.equals(branchBlob) && !currentBlob.equals(branchBlob)) {
                 handleConflict(file, currentBlob, branchBlob);
             }
         }
@@ -623,6 +629,12 @@ public class Repository implements Serializable {
     }
 
     public static Repository load(){
-        return readObject(repositoryFile, Repository.class);
+        if (!GITLET_DIR.exists() || !repositoryFile.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+            return null;
+        } else {
+            return readObject(repositoryFile, Repository.class);
+        }
     }
 }
