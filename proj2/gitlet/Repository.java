@@ -482,7 +482,7 @@ public class Repository implements Serializable {
         currentContent = (currentContent != null) ? currentContent : new HashMap<>();
         branchContent = (branchContent != null) ? branchContent : new HashMap<>();
         splitContent = (splitContent != null) ? splitContent : new HashMap<>();
-        
+
         Set<String> allFiles = new HashSet<>();
         allFiles.addAll(currentContent.keySet());
         allFiles.addAll(branchContent.keySet());
@@ -548,9 +548,9 @@ public class Repository implements Serializable {
 
         String conflictContent = "<<<<<<< HEAD\n" +
                 currentContent +
-                "\n=======\n" +
+                "=======\n" +
                 branchContent +
-                "\n>>>>>>>\n";
+                ">>>>>>>\n";
 
         File file = new File(CWD, filename);
         writeContents(file, conflictContent);
@@ -598,11 +598,13 @@ public class Repository implements Serializable {
 
     public void log(){
         Commit current = Commit.getCommit(HEAD);
-        System.out.println(current.log());
+        String tmp = current.log();
+        System.out.println(tmp.substring(0, tmp.length()-1));
     }
 
     public void globalLog(){
-        System.out.println(Commit.GlobalLog());
+        String tmp = Commit.GlobalLog();
+        System.out.println(tmp.substring(0, tmp.length()-1));
     }
 
     private boolean emptyStagingArea(){
