@@ -511,8 +511,8 @@ public class Repository implements Serializable {
                 removeFile(file);
             }
             // Requirement 9: File modified differently in the current and given branches (conflict)
-            else if (splitBlob != null && currentBlob != null && branchBlob != null &&
-                    !splitBlob.equals(currentBlob) && !splitBlob.equals(branchBlob) && !currentBlob.equals(branchBlob)) {
+            else if ( (splitBlob != null && currentBlob != null && !splitBlob.equals(currentBlob) && !splitBlob.equals(branchBlob)) ||
+                     (splitBlob != null && branchBlob != null && !splitBlob.equals(branchBlob) && !splitBlob.equals(currentBlob))) {
                 handleConflict(file, currentBlob, branchBlob);
             }
         }
