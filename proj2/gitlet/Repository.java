@@ -215,68 +215,79 @@ public class Repository implements Serializable {
         }
     }
 
-    public String status(){
+    public String status() {
         StringBuilder status = new StringBuilder();
         Staging staging = Staging.load();
-        status.append("=== Branches ===" + "\n");
+        status.append("=== Branches ===\n");
+
         String currentBranch = head.get("HEAD");
+
+        // Collect branch names (excluding "HEAD"), sort, and append
+        List<String> branches = new ArrayList<>();
         for (String branch : head.keySet()) {
             if (!branch.equals("HEAD")) {
                 if (branch.equals(currentBranch)) {
-                    status.append("*").append(branch).append("\n");
+                    branches.add("*" + branch);
                 } else {
-                    status.append(branch).append("\n");
+                    branches.add(branch);
                 }
             }
         }
+        appendSortedList(status, branches);
 
-        status.append("\n=== Staged Files ===" + "\n");
-        for (String addition : staging.getAddition().keySet()) {
-            status.append(addition).append("\n");
-        }
+        // Append sorted staged files
+        status.append("\n=== Staged Files ===\n");
+        List<String> additions = new ArrayList<>(staging.getAddition().keySet());
+        appendSortedList(status, additions);
 
-        status.append("\n=== Removed Files ===" + "\n");
-        for (String deletion : staging.getDeletion()) {
-            status.append(deletion).append("\n");
-        }
+        // Append sorted removed files
+        status.append("\n=== Removed Files ===\n");
+        List<String> deletions = new ArrayList<>(staging.getDeletion());
+        appendSortedList(status, deletions);
 
-        List<String> untracked = new ArrayList<String>();
-        status.append("\n=== Modifications Not Staged For Commit ===" + "\n");
+        // Collect and append sorted modifications not staged for commit
+        status.append("\n=== Modifications Not Staged For Commit ===\n");
         HashMap<String, String> future = Commit.SetContent(Commit.getCommit(HEAD));
         List<String> files = plainFilenamesIn(CWD);
+        List<String> untracked = new ArrayList<>();
+        List<String> modifications = new ArrayList<>();
+
         for (String file : files) {
             File currentFile = new File(CWD, file);
 
             // Case 1: File is tracked but deleted in the working directory (not staged for removal)
-            // exist in the future but not exist in the CWD
             if (future.containsKey(file) && !currentFile.exists() && !staging.getDeletion().contains(file)) {
-                status.append(file).append(" (deleted)\n");
+                modifications.add(file + " (deleted)");
             }
             // Case 2: File is modified but not staged
             else if (future.containsKey(file)) {
-                File f = new File(CWD, file);
-                String tmp = compare(file, f, future);
-                if (tmp != null) {
-                    if (tmp.endsWith("(modified)")) {
-                        status.append(tmp).append("\n");
-                    } else if (tmp.endsWith("(untracked)")) {
-                        untracked.add(tmp.substring(0, tmp.length() - "(untracked)".length()));
-                    }
+                String tmp = compare(file, currentFile, future);
+                if (tmp != null && tmp.endsWith("(modified)")) {
+                    modifications.add(tmp);
+                } else if (tmp != null && tmp.endsWith("(untracked)")) {
+                    untracked.add(tmp.substring(0, tmp.length() - "(untracked)".length()));
                 }
             }
             // Case 3: File is untracked (doesn't exist in the future commit)
-            // exist in the CWD but not future
             else if (!staging.getAddition().containsKey(file)) {
                 untracked.add(file);
             }
         }
 
-        status.append("\n=== Untracked Files ===" + "\n");
-        for (String untrackedFile : untracked) {
-            status.append(untrackedFile).append("\n");
-        }
+        appendSortedList(status, modifications);
+
+        // Append sorted untracked files
+        status.append("\n=== Untracked Files ===\n");
+        appendSortedList(status, untracked);
 
         return status.toString();
+    }
+
+    private void appendSortedList(StringBuilder sb, List<String> list) {
+        Collections.sort(list);
+        for (String item : list) {
+            sb.append(item).append("\n");
+        }
     }
 
     // overwrite the file in CWD with the corresponding file name in the given commit do not stage it
