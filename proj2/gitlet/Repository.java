@@ -148,7 +148,7 @@ public class Repository implements Serializable {
             // stage it for removal and remove the file from the working directory if the user has not already done so
         } else if (n.containsKey(filename)) {
             staging.getDeletion().add(filename);
-            File f = new File(filename);
+            File f = new File(CWD, filename);
             restrictedDelete(f);
         } else {
             // the file is neither staged nor tracked by the head commit
@@ -197,7 +197,11 @@ public class Repository implements Serializable {
                 finded.append(filename).append("\n");
             }
         }
-        return finded.toString();
+        if (finded.length() == 0){
+            return "Found no commit with that message.";
+        } else {
+            return finded.toString();
+        }
     }
 
     public String status(){
@@ -261,35 +265,34 @@ public class Repository implements Serializable {
             status.append(untrackedFile).append("\n");
         }
 
-        status.append("\n");
         return status.toString();
     }
 
     // overwrite the file in CWD with the corresponding file name in the given commit do not stage it
-    private boolean overWrite(String filename, String commitName, String commit) {
-        File file = new File(CWD, filename);
-        if (!file.exists()) {
-            return false;
-        }
-        // get the previous commits' hash code
-        String previousContent = Commit.getCommit(commit).getFileContent(commitName);
+    // only returns false if that filename didn't exist in that commit
+    private boolean overWrite(String filename, String commit) {
+        // get the file content in that commit
+        String previousContent = Commit.getCommit(commit).getFileContent(filename);
         if (previousContent == null) {
             return false;
         }
+        // overWrite the file in CWD if the file exists, otherwise put it in the CWD
+        File file = new File(CWD, filename);
         writeContents(file, previousContent);
         return true;
     }
 
     public void overWriteWithSameFileName(String filename) {
-        boolean tmp = overWrite(filename, filename, HEAD);
+        boolean tmp = overWrite(filename, HEAD);
         if (!tmp) {
             System.out.println("File does not exist in that commit. ");
             System.exit(0);
         }
     }
 
+    // takes the version of the file with file name in that commit
     public void overWriteWithDifferentFileName(String filename, String commitName) {
-        boolean tmp = overWrite(filename, commitName, HEAD);
+        boolean tmp = overWrite(filename,  commitName);
         if (!tmp){
             System.out.println("No commit with that id exists.");
             System.exit(0);
@@ -359,6 +362,10 @@ public class Repository implements Serializable {
 
     //  Creates a new branch with the given name, and points it at the current head commit.
     public void branch(String newBranch) {
+        if (head.containsKey(newBranch)) {
+            System.out.println("Branch already exists.");
+            return;
+        }
         head.put("HEAD", newBranch);
         head.put(newBranch, HEAD);
         save();

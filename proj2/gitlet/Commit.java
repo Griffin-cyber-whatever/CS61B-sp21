@@ -56,8 +56,7 @@ public class Commit implements Serializable {
         this.message = "initial commit";
         this.parent = null;
         this.secondParent = null;
-        Date now = new Date();
-        this.timestamp = String.valueOf((now.getTime()/1000));
+        this.timestamp = "Wed Dec 31 16:00:00 1969 -0800";
         hashCode = sha1(message + timestamp);
         commitFile = new File(commits, hashCode);
         save();
@@ -73,7 +72,10 @@ public class Commit implements Serializable {
 
         // set metadata
         this.message = message;
-        this.timestamp = LocalDateTime.now().toString();
+        Date now = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy Z");
+        formatter.setTimeZone(TimeZone.getDefault());
+        timestamp = formatter.format(now);
         this.parent = parent;
         this.secondParent = null;
 
@@ -169,12 +171,11 @@ public class Commit implements Serializable {
 
     // generate a single block of commit log
     public String writeCommitLog(){
-        String formattedDate = formatTimestamp(this.timestamp);
         return String.format("===\n" +
                 "commit %s\n" +
-                "Date %s\n" +
+                "Date: %s\n" +
                 "%s\n\n",
-                hashCode, formattedDate, message);
+                hashCode, timestamp, message);
     }
 
     // generate a single block of merge log
@@ -182,13 +183,12 @@ public class Commit implements Serializable {
     public String writeMergeLog(){
         String firstParent = this.parent.substring(0, 7);
         String secondParent = this.secondParent.substring(0, 7);
-        String formattedDate = formatTimestamp(this.timestamp);
         return String.format("===\n" +
                         "commit %s\n" +
                         "Merge %s %s\n" +
-                        "Date %s\n" +
+                        "Date: %s\n" +
                         "%s\n\n",
-                hashCode, firstParent, secondParent, formattedDate, message);
+                hashCode, firstParent, secondParent, timestamp, message);
     }
 
     public String log(){
@@ -222,14 +222,5 @@ public class Commit implements Serializable {
         return tmp.toString();
     }
 
-    // method to generate formatted timestamp
-    private String formatTimestamp(String timestamp) {
-        OffsetDateTime dateTime = OffsetDateTime.parse(timestamp, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-        long epoch = dateTime.toInstant().getEpochSecond();
-        Date date = new Date(epoch * 1000);  // Convert to milliseconds
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy Z");
-        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT-8")); // Set the timezone (you can adjust as needed)
-        return dateFormat.format(date);
-    }
 
 }
