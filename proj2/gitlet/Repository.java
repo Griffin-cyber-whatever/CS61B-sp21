@@ -602,12 +602,12 @@ public class Repository implements Serializable {
     }
 
     private String findLCA(String current, String branch, String initialAncestor) {
-        int maxDepth = -1;
+        int maxDepth = 1;
         String latestCommonAncestor = initialAncestor;
 
         // Traverse through all branches and find the deepest common ancestor.
         for (String branchName : head.keySet()) {
-            if (!branchName.equals(current) && !branchName.equals(branch)) {
+            if (!branchName.equals(current) && !branchName.equals(branch) && !branchName.equals("HEAD")) {
                 String branchHead = head.get(branchName);
                 int depth = findDepth(branchHead, initialAncestor);
 
@@ -635,7 +635,7 @@ public class Repository implements Serializable {
             depth++;
         }
 
-        // If we didn't find the common ancestor, return a large negative value.
+        // If we didn't find the common ancestor in the path, return a large negative value.
         return -1;
     }
 
