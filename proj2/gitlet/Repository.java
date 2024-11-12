@@ -374,13 +374,13 @@ public class Repository implements Serializable {
         if (files == null || files.isEmpty()) {
             return;
         }
+        Staging staging = Staging.load();
         Commit currentCommit = Commit.getCommit(HEAD);
         HashMap<String, String> currentContent = currentCommit.getContent();
         for (String file : files) {
-            File currentFile = new File(CWD, file);
-            Blobs tmp = new Blobs(readContentsAsString(currentFile));
             // An untracked file is identified by its filename not being present in the last commit.
-            if ( currentContent == null ||  currentContent.isEmpty() || !currentContent.containsKey(file) ) {
+            // The file’s name hasn’t been added to the staging area (using git add).
+            if ( currentContent == null ||  currentContent.isEmpty() || !currentContent.containsKey(file) || !staging.getAddition().containsKey(file)) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 System.exit(0);
             }
