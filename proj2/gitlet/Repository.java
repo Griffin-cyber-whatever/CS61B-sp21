@@ -379,7 +379,8 @@ public class Repository implements Serializable {
         for (String file : files) {
             File currentFile = new File(CWD, file);
             Blobs tmp = new Blobs(readContentsAsString(currentFile));
-            if ( currentContent == null ||  currentContent.isEmpty() || !currentContent.containsValue(tmp.getBlobId()) ) {
+            // An untracked file is identified by its filename not being present in the last commit.
+            if ( currentContent == null ||  currentContent.isEmpty() || !currentContent.containsKey(file) ) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 System.exit(0);
             }
