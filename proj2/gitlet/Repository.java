@@ -465,7 +465,7 @@ public class Repository implements Serializable {
             return;
         }
 
-        String split = findLCA(head.get("HEAD"), branch, getAncestor(HEAD, branchId));
+        String split = findLCA(HEAD, branchId, getAncestor(HEAD, branchId));
 
         // Handle ancestor cases.
         if (split.equals(branchId)) {
@@ -608,10 +608,11 @@ public class Repository implements Serializable {
 
         // Traverse through all branches and find the deepest common ancestor.
         for (String branchName : head.keySet()) {
-            if (!branchName.equals(current) && !branchName.equals(branch) && !branchName.equals("HEAD")) {
-                String branchHead = head.get(branchName);
+            // there is no path between branch name, current and branch
+            String branchHead = head.get(branchName);
+            if (!branchName.equals(current) && !branchName.equals(branch) && !branchName.equals("HEAD") && (findDepth(branchHead, current)) < 0
+            && (findDepth(branchHead, branch)) < 0) {
                 int depth = findDepth(branchHead, initialAncestor);
-
                 // If the depth is greater, update the deepest common ancestor.
                 if (depth > maxDepth) {
                     maxDepth = depth;
@@ -624,8 +625,9 @@ public class Repository implements Serializable {
     }
 
     // Helper method to find the depth of a given commit relative to the common ancestor.
+    // commonAncestor is hash code
     private int findDepth(String givenCommit, String commonAncestor) {
-        int depth = -1;
+        int depth = 0;
         Commit current = Commit.getCommit(givenCommit);
 
         while (current != null) {
