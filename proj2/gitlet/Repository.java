@@ -375,8 +375,11 @@ public class Repository implements Serializable {
         }
         Commit currentCommit = Commit.getCommit(HEAD);
         HashMap<String, String> currentContent = currentCommit.getContent();
+        if (currentContent == null || currentContent.isEmpty()) {
+            return;
+        }
         for (String file : files) {
-            if ( currentContent == null ||  currentContent.isEmpty() || !currentContent.containsKey(file)) {
+            if ( !currentContent.containsKey(file)) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 System.exit(0);
             }
@@ -461,7 +464,7 @@ public class Repository implements Serializable {
             return;
         }
 
-        String split = getAncestor(HEAD, branchId);
+        String split = findLCA(head.get("HEAD"), branch, getAncestor(HEAD, branchId));
 
         // Handle ancestor cases.
         if (split.equals(branchId)) {
@@ -574,6 +577,7 @@ public class Repository implements Serializable {
         queue.add(current);
         queue.add(given);
 
+        String commonAncestor = null;
         // Perform BFS until we find a common ancestor
         while (!queue.isEmpty()) {
             String commit = queue.poll();
@@ -595,6 +599,44 @@ public class Repository implements Serializable {
         }
 
         return null; // No common ancestor found (unlikely in Git)
+    }
+
+    private String findLCA(String current, String branch, String initialAncestor) {
+        int maxDepth = -1;
+        String latestCommonAncestor = initialAncestor;
+
+        // Traverse through all branches and find the deepest common ancestor.
+        for (String branchName : head.keySet()) {
+            if (!branchName.equals(current) && !branchName.equals(branch)) {
+                String branchHead = head.get(branchName);
+                int depth = findDepth(branchHead, initialAncestor);
+
+                // If the depth is greater, update the deepest common ancestor.
+                if (depth > maxDepth) {
+                    maxDepth = depth;
+                    latestCommonAncestor = branchHead;
+                }
+            }
+        }
+
+        return latestCommonAncestor;
+    }
+
+    // Helper method to find the depth of a given commit relative to the common ancestor.
+    private int findDepth(String givenCommit, String commonAncestor) {
+        int depth = 0;
+        Commit current = Commit.getCommit(givenCommit);
+
+        while (current != null) {
+            if (current.getHash().equals(commonAncestor)) {
+                return depth;
+            }
+            current = Commit.getCommit(current.getParent());
+            depth++;
+        }
+
+        // If we didn't find the common ancestor, return a large negative value.
+        return -1;
     }
 
     public void log(){
