@@ -368,6 +368,7 @@ public class Repository implements Serializable {
         }
     }
 
+    // check actual content here
     private void untrackedFileExists(){
         List<String> files = plainFilenamesIn(CWD);
         if (files == null || files.isEmpty()) {
@@ -375,11 +376,10 @@ public class Repository implements Serializable {
         }
         Commit currentCommit = Commit.getCommit(HEAD);
         HashMap<String, String> currentContent = currentCommit.getContent();
-        if (currentContent == null || currentContent.isEmpty()) {
-            return;
-        }
         for (String file : files) {
-            if ( !currentContent.containsKey(file)) {
+            File currentFile = new File(CWD, file);
+            Blobs tmp = new Blobs(readContentsAsString(currentFile));
+            if ( currentContent == null ||  currentContent.isEmpty() || !currentContent.containsValue(tmp.getBlobId()) ) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 System.exit(0);
             }
@@ -576,8 +576,7 @@ public class Repository implements Serializable {
         // Start BFS from both current and given branches
         queue.add(current);
         queue.add(given);
-
-        String commonAncestor = null;
+        
         // Perform BFS until we find a common ancestor
         while (!queue.isEmpty()) {
             String commit = queue.poll();
