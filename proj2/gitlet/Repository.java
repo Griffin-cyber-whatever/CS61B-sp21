@@ -474,6 +474,7 @@ public class Repository implements Serializable {
         }
         if (split.equals(HEAD)) {
             System.out.println("Current branch fast-forwarded.");
+            overWriteBranch(branch);
             return;
         }
 
@@ -602,7 +603,7 @@ public class Repository implements Serializable {
     }
 
     private String findLCA(String current, String branch, String initialAncestor) {
-        int maxDepth = 1;
+        int maxDepth = 0;
         String latestCommonAncestor = initialAncestor;
 
         // Traverse through all branches and find the deepest common ancestor.
@@ -624,7 +625,7 @@ public class Repository implements Serializable {
 
     // Helper method to find the depth of a given commit relative to the common ancestor.
     private int findDepth(String givenCommit, String commonAncestor) {
-        int depth = 0;
+        int depth = -1;
         Commit current = Commit.getCommit(givenCommit);
 
         while (current != null) {
