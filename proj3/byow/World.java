@@ -41,7 +41,7 @@ public class World {
         int numberOfNodes = (int) Math.max(1, CoverageFactor * width * height * 4 / ((MaxWidth + MinWidth) * (MaxHeight + MinHeight)));
 
         // generate the world array
-        NodeGenerator(numberOfNodes);
+        VertexGenerator(numberOfNodes);
         RoomGenerator();
         generatePaths(getMST());
         wrapFloorWithWalls();
@@ -102,18 +102,18 @@ public class World {
         }
     }
 
-    private void NodeGenerator(int numberOfNodes) {
+    private void VertexGenerator(int numberOfNodes) {
         for (int x = 0; x < numberOfNodes; x++) {
             int tmpX = rand.nextInt(Width - 3) + 2;
             int tmpY = rand.nextInt(Height - 3) + 2;
-            world[tmpX][tmpY].setTile(Tileset.FLOWER);
             vertex.add(world[tmpX][tmpY]);
         }
     }
 
     // Generate rooms using a spiral/random walk approach to maximize space utilization
     private void RoomGenerator() {
-        for (Node n : vertex) {
+        for (int i = 0; i < vertex.size(); i++) {
+            Node n = vertex.get(i);
             boolean roomPlaced = false;
             int attemptCount = 0;  // To avoid infinite loops
             while (!roomPlaced && attemptCount < 100) {
@@ -130,14 +130,15 @@ public class World {
                 }
 
                 // Try spiral approach to place rooms
-                roomPlaced = placeRoomSpirally(xOffset, yOffset, width, height);
+                roomPlaced = placeRoomSpirally(xOffset, yOffset, width, height, i);
                 attemptCount++;
             }
         }
     }
 
     // Spiral approach to place room, expanding outward from the center
-    private boolean placeRoomSpirally(int centerX, int centerY, int roomWidth, int roomHeight) {
+    private boolean placeRoomSpirally(int centerX, int centerY, int roomWidth, int roomHeight, int vertexNumber) {
+
         int xOffset = centerX;
         int yOffset = centerY;
         int leftBoundary = xOffset - roomWidth / 2;
@@ -165,6 +166,9 @@ public class World {
                 // Check if this area is valid for room placement
                 if (IsRoomValid(xOffset, yOffset, roomWidth, roomHeight)) {
                     CreateRoom(xOffset, yOffset, roomWidth, roomHeight);
+                    System.out.println("original vertex" + vertexNumber);
+                    vertex.set(vertexNumber, world[xOffset + roomWidth/2][yOffset + roomHeight/2]);
+                    world[xOffset + roomWidth/2][yOffset + roomHeight/2].setTile(Tileset.FLOWER);
                     return true;
                 }
             }
