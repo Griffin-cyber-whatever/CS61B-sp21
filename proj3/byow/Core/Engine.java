@@ -2,6 +2,7 @@ package byow.Core;
 
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
+import byow.World;
 
 public class Engine {
     TERenderer ter = new TERenderer();
@@ -9,6 +10,7 @@ public class Engine {
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
 
+    private TETile[][] world;
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
@@ -45,8 +47,19 @@ public class Engine {
         //
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
+        if (!(input.startsWith("N") || input.startsWith("n")) || !(input.endsWith("s") || input.endsWith("S"))) {
+            System.out.println("Invalid input");
+            return null;
+        }
 
-        TETile[][] finalWorldFrame = null;
-        return finalWorldFrame;
+        World w = new World(WIDTH, HEIGHT, (long) input.hashCode());
+        System.out.println(w + "World w");
+        this.world = w.getWorld();
+        return world;
     }
+
+    public String toString(){
+        return TETile.toString(world);
+    }
+
 }

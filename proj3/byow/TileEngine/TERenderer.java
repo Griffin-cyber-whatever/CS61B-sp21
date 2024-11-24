@@ -28,6 +28,7 @@ public class TERenderer {
      * @param h height of the window in tiles.
      */
     public void initialize(int w, int h, int xOff, int yOff) {
+        // x,y -> start position of rendering tiles
         this.width = w;
         this.height = h;
         this.xOffset = xOff;

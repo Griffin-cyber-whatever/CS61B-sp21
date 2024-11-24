@@ -54,31 +54,114 @@ public class MemoryGame {
         StdDraw.enableDoubleBuffering();
 
         //TODO: Initialize random number generator
+        rand = new Random(seed);
     }
 
     public String generateRandomString(int n) {
         //TODO: Generate random string of letters of length n
-        return null;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < n; i++) {
+            sb.append(CHARACTERS[rand.nextInt(CHARACTERS.length)]);
+        }
+        return sb.toString();
     }
 
     public void drawFrame(String s) {
-        //TODO: Take the string and display it in the center of the screen
-        //TODO: If game is not over, display relevant game information at the top of the screen
+        // Clear the screen for a new frame
+        StdDraw.clear();
+
+        // Centered game over message
+        if (gameOver) {
+            String end = "Game Over! You made it to round: " + round;
+            StdDraw.text((double) this.width / 2, (double) this.height / 2, end);
+            StdDraw.show();
+            return;
+        }
+
+        // Draw game information (top UI)
+        String rounds = "Round: " + round;
+        String tmp = ENCOURAGEMENT[rand.nextInt(ENCOURAGEMENT.length)];
+        double padding = 1; // Padding for text positioning
+
+        // Top-left: Round information
+        StdDraw.text(padding * tmp.length() / 2, this.height - padding, rounds);
+        System.out.println(rounds.length() + "" + padding * rounds.length() / 2);
+
+        // Top-center: Player status (Type/Watch)
+        if (playerTurn) {
+            StdDraw.text((double) this.width / 2, this.height - padding, "Type!");
+        } else {
+            StdDraw.text((double) this.width / 2, this.height - padding, "Watch!");
+        }
+
+        // Top-right: Encouragement text
+        StdDraw.text(this.width - padding * tmp.length() / 2, this.height - padding, tmp);
+
+        // Draw boundary line
+        StdDraw.line(0, this.height - 2 * padding, this.width, this.height - 2 * padding);
+
+        // Display the main text in the center of the screen
+        StdDraw.text((double) this.width / 2, (double) this.height / 2, s);
+
+        // Adjust the delay based on whether the string is empty
+        if (s.isEmpty()) {
+            StdDraw.show(500);
+        } else {
+            StdDraw.show(1000);
+        }
     }
+
 
     public void flashSequence(String letters) {
         //TODO: Display each character in letters, making sure to blank the screen between letters
+        for (char i : letters.toCharArray()) {
+            drawFrame(String.valueOf(i));
+            StdDraw.show(500);
+            StdDraw.clear();
+        }
     }
 
     public String solicitNCharsInput(int n) {
-        //TODO: Read n letters of player input
-        return null;
+        // StringBuilder to store the user's input
+        StringBuilder sb = new StringBuilder();
+
+        // Continue until we collect exactly n characters
+        while (sb.length() < n) {
+            drawFrame(sb.toString());
+            // Check if a key has been typed
+            if (StdDraw.hasNextKeyTyped()) {
+                // Append the typed character to the result
+                sb.append(StdDraw.nextKeyTyped());
+            }
+        }
+
+        // Indicate input is complete (optional)
+        System.out.println("Input complete: " + sb.toString());
+        return sb.toString();
     }
+
 
     public void startGame() {
         //TODO: Set any relevant variables before the game starts
 
         //TODO: Establish Engine loop
+        round = 1;
+        while (!gameOver) {
+            drawFrame("Round: " + round);
+            String randomString = generateRandomString(round);
+            flashSequence(randomString);
+            playerTurn = true;
+            String player = solicitNCharsInput(round);
+            drawFrame(player);
+            System.out.println(player + "player complete");
+            if (player.equals(randomString)) {
+                playerTurn = false;
+                round++;
+            } else {
+                gameOver = true;
+            }
+        }
+        drawFrame("Game Over!");
     }
 
 }
