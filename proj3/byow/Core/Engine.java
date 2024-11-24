@@ -1,5 +1,6 @@
 package byow.Core;
 
+import byow.Render;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.World;
@@ -16,6 +17,8 @@ public class Engine {
      * including inputs from the main menu.
      */
     public void interactWithKeyboard() {
+        Render render = new Render(WIDTH, HEIGHT);
+        render.renderGame();
     }
 
     /**

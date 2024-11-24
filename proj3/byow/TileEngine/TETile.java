@@ -84,6 +84,7 @@ public class TETile {
     public void draw(double x, double y) {
         if (filepath != null) {
             try {
+                System.out.println(filepath);
                 StdDraw.picture(x + 0.5, y + 0.5, filepath);
                 return;
             } catch (IllegalArgumentException e) {

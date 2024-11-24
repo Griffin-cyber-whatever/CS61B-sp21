@@ -16,6 +16,8 @@ public class World {
     private int Width;
     private int Height;
     private ArrayList<Node> vertex;
+    // set avatar position with one of vertex
+    private Node avatar;
 
     public World(int width, int height, long seed) {
         this.Width = width;
@@ -30,7 +32,7 @@ public class World {
         vertex = new ArrayList<>();
 
         // total Room Area = CoverageFactor * width * height
-        double CoverageFactor = 0.7;
+        double CoverageFactor = 0.3;
 
         int MaxWidth = Math.max(1, width / 3);
         int MaxHeight = Math.max(1, height/3);
@@ -43,6 +45,10 @@ public class World {
         RoomGenerator();
         generatePaths(getMST());
         wrapFloorWithWalls();
+
+        // initializing avatar
+        avatar = vertex.get(rand.nextInt(vertex.size()));
+        avatar.setTile(Tileset.AVATAR);
     }
 
     private boolean IsValidForRoom(int x, int y) {
@@ -90,10 +96,8 @@ public class World {
     private void CreateRoom(int leftBoundary, int bottomBoundary, int width, int height) {
         for (int x = leftBoundary; x < leftBoundary + width; x++) {
             for (int y = bottomBoundary; y < bottomBoundary + height; y++) {
-                if (IsValidForRoom(x, y)) {
                     world[x][y].setTile(Tileset.FLOOR);
                     world[x][y].setRoom();
-                }
             }
         }
     }
@@ -107,38 +111,66 @@ public class World {
         }
     }
 
-    // generate room for different nodes in MST
+    // Generate rooms using a spiral/random walk approach to maximize space utilization
     private void RoomGenerator() {
         for (Node n : vertex) {
             boolean roomPlaced = false;
-            int attemptCount = 0; // To avoid infinite loop
+            int attemptCount = 0;  // To avoid infinite loops
             while (!roomPlaced && attemptCount < 100) {
-                // Gradually decrease the room size range after each failed attempt
+                // Starting coordinates (n.getX(), n.getY()) can be dynamically adjusted or randomized
+                int xOffset = n.getX();
+                int yOffset = n.getY();
                 int width = rand.nextInt(Width / 3 - Width / 5) + Width / 5;
                 int height = rand.nextInt(Height / 3 - Height / 5) + Height / 5;
 
-                // Gradually adjust the range of room sizes
+                // Gradually adjust room size after failed attempts
                 if (attemptCount > 50) {
                     width = rand.nextInt(Width / 4 - Width / 6) + Width / 6;
                     height = rand.nextInt(Height / 4 - Height / 6) + Height / 6;
                 }
 
-                int xOffset = n.getX();
-                int yOffset = n.getY();
-
-                // Try placing the room within adjusted bounds
-                int leftBoundary = Math.max(0, xOffset - width / 2);
-                int bottomBoundary = Math.min(Height - 1, yOffset - height / 2);
-
-                // Check if room placement is valid
-                if (IsRoomValid(leftBoundary, bottomBoundary, width, height)) {
-                    CreateRoom(leftBoundary, bottomBoundary, width, height);
-                    roomPlaced = true;
-                }
-
+                // Try spiral approach to place rooms
+                roomPlaced = placeRoomSpirally(xOffset, yOffset, width, height);
                 attemptCount++;
             }
         }
+    }
+
+    // Spiral approach to place room, expanding outward from the center
+    private boolean placeRoomSpirally(int centerX, int centerY, int roomWidth, int roomHeight) {
+        int xOffset = centerX;
+        int yOffset = centerY;
+        int leftBoundary = xOffset - roomWidth / 2;
+        int bottomBoundary = yOffset - roomHeight / 2;
+
+        // Attempt placing the room with a spiral walk
+        for (int radius = 1; radius < Math.max(Width, Height); radius++) {
+            for (int i = 0; i < 4; i++) {
+                // Depending on the direction of the spiral, move in the grid
+                switch (i) {
+                    case 0: // Move right
+                        xOffset = centerX + radius;
+                        break;
+                    case 1: // Move down
+                        yOffset = centerY + radius;
+                        break;
+                    case 2: // Move left
+                        xOffset = centerX - radius;
+                        break;
+                    case 3: // Move up
+                        yOffset = centerY - radius;
+                        break;
+                }
+
+                // Check if this area is valid for room placement
+                if (IsRoomValid(xOffset, yOffset, roomWidth, roomHeight)) {
+                    CreateRoom(xOffset, yOffset, roomWidth, roomHeight);
+                    return true;
+                }
+            }
+        }
+
+        return false;  // If room can't be placed within the spiral walk
     }
 
     /*
@@ -252,4 +284,45 @@ public class World {
         return tmp;
     }
 
+    public void moveUp(){
+        int avatarX = avatar.getX();
+        int avatarY = avatar.getY();
+        if (world[avatarX][avatarY + 1].isRoom()) {
+            swapNode(avatar, world[avatarX][avatarY + 1]);
+        }
+    }
+
+    public void moveDown(){
+        int avatarX = avatar.getX();
+        int avatarY = avatar.getY();
+        if (world[avatarX][avatarY - 1].isRoom()) {
+            swapNode(avatar, world[avatarX][avatarY - 1]);
+        }
+    }
+
+    public void moveLeft(){
+        int avatarX = avatar.getX();
+        int avatarY = avatar.getY();
+        if (world[avatarX - 1][avatarY].isRoom()) {
+            swapNode(avatar, world[avatarX - 1][avatarY]);
+        }
+    }
+
+    public void moveRight(){
+        int avatarX = avatar.getX();
+        int avatarY = avatar.getY();
+        if (world[avatarX + 1][avatarY].isRoom()) {
+            swapNode(avatar, world[avatarX + 1][avatarY]);
+        }
+    }
+
+    private void swapNode(Node source, Node target) {
+        int sourceX = source.getX();
+        int sourceY = source.getY();
+        int targetX = target.getX();
+        int targetY = target.getY();
+        Node tmp = world[sourceX][sourceY];
+        world[sourceX][sourceY] = world[targetX][targetY];
+        world[targetX][targetY] = tmp;
+    }
 }
