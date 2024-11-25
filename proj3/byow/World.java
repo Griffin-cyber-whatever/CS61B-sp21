@@ -4,13 +4,22 @@ import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
+import java.io.*;
+import java.nio.file.FileAlreadyExistsException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /* my solution:
 *   using seed to generate node for world, each node would be a room
 *   using MST to connect all of them with hall
 *   wrap room and hall with wall in the end*/
-public class World {
+public class World implements Serializable {
+    // saves location
+    public static final File CWD = new File(System.getProperty("user.dir"));
+    public static final File savesAddress = new File(CWD, "saves");
+    private File saveFile;
+    private String fileName;
+
     private Node[][] world;
     private Random rand;
     private int Width;
@@ -52,11 +61,83 @@ public class World {
         // initializing avatar
         avatar = vertex.get(rand.nextInt(vertex.size()));
         avatar.setTile(Tileset.AVATAR);
+
+        // initializing save of current object
+        savesInitializing();
+    }
+
+    private void savesInitializing(){
+        this.fileName = currentTime();
+        this.saveFile = new File(savesAddress, fileName);
+
+        FileSetupChecking();
+    }
+
+    private String currentTime(){
+        Date now = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+        formatter.setTimeZone(TimeZone.getDefault());
+        return formatter.format(now);
+    }
+
+    // ensure that directory have been initialized
+    private void FileSetupChecking(){
+        try {
+            savesAddress.mkdir();
+            saveFile.createNewFile();
+        } catch (FileAlreadyExistsException e){
+            // ignore
+        } catch (IOException e){
+            System.out.println("IO Exception");
+            throw new IllegalArgumentException("setup failed" + e);
+        }
     }
 
     private boolean IsValidForRoom(int x, int y) {
         return x > 0 && x < world.length -1  && y > 0 && y < world[0].length -1 && world[x][y].getTile() == Tileset.NOTHING;
     }
+
+    // save current object in that
+    public void save(){
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(savesAddress))) {
+            oos.writeObject(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // load the latest object
+    public static World load() {
+        if (!savesAddress.exists() || !savesAddress.isDirectory()) {
+            throw new IllegalStateException("Saves directory does not exist or is not a directory.");
+        }
+
+        File[] files = savesAddress.listFiles();
+        if (files == null || files.length == 0) {
+            throw new IllegalStateException("No save files found.");
+        }
+
+        // Find the latest file by name (assumes names are timestamps)
+        File latestFile = Arrays.stream(files)
+                .filter(File::isFile)
+                .max(Comparator.comparing(File::getName))
+                .orElseThrow(() -> new IllegalStateException("No valid save files found."));
+
+        // Load the object from the latest file
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(latestFile))) {
+            Object loadedObject = ois.readObject();
+            if (loadedObject instanceof World) {
+                World loadedData = (World) loadedObject;
+                return loadedData;
+            } else {
+                throw new IllegalArgumentException("The file does not contain a valid object.");
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            throw new IllegalStateException("Failed to load the save file.", e);
+        }
+    }
+
 
     private boolean IsWallValid(int x, int y) {
         if (x < 0 || x >= world.length || y < 0 || y >= world[0].length || world[x][y].getTile() != Tileset.NOTHING){
@@ -338,4 +419,5 @@ public class World {
         world[sourceX][targetY].setPosition(sourceX, sourceY);
         world[targetX][targetY].setPosition(targetX, targetY);
     }
+
 }
