@@ -3,6 +3,7 @@ package byow.Core;
 import byow.Render;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
+import byow.TileEngine.Tileset;
 import byow.World;
 
 public class Engine {
@@ -17,8 +18,8 @@ public class Engine {
      * including inputs from the main menu.
      */
     public void interactWithKeyboard() {
-        Render render = new Render(WIDTH, HEIGHT);
-        render.renderGame();
+           Render render = new Render(WIDTH, HEIGHT);
+           render.renderGame();
     }
 
     /**
@@ -56,7 +57,6 @@ public class Engine {
         }
 
         World w = new World(WIDTH, HEIGHT, (long) input.hashCode());
-        System.out.println(w + "World w");
         this.world = w.getWorld();
         return world;
     }

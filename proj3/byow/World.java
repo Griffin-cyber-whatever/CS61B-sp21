@@ -18,6 +18,12 @@ public class World {
     private ArrayList<Node> vertex;
     // set avatar position with one of vertex
     private Node avatar;
+    // set this would change the num of rooms
+    private final double CoverageFactor = 0.5;
+    // set this would change the ratio between room size and total map
+    private final int RoomSizeFactor = 3;
+    // the minimum gap between each rooms
+    private final int MinimumRoomGap = 3;
 
     public World(int width, int height, long seed) {
         this.Width = width;
@@ -31,13 +37,10 @@ public class World {
         }
         vertex = new ArrayList<>();
 
-        // total Room Area = CoverageFactor * width * height
-        double CoverageFactor = 0.3;
-
-        int MaxWidth = Math.max(1, width / 3);
-        int MaxHeight = Math.max(1, height/3);
-        int MinWidth = Math.max(1, width/5);
-        int MinHeight = Math.max(1, height/5);
+        int MaxWidth = Math.max(1, width /RoomSizeFactor);
+        int MaxHeight = Math.max(1, height/RoomSizeFactor);
+        int MinWidth = Math.max(1, width/(RoomSizeFactor + 2));
+        int MinHeight = Math.max(1, height/(RoomSizeFactor + 2));
         int numberOfNodes = (int) Math.max(1, CoverageFactor * width * height * 4 / ((MaxWidth + MinWidth) * (MaxHeight + MinHeight)));
 
         // generate the world array
@@ -82,8 +85,8 @@ public class World {
             return false;
         }
 
-        for (int x = leftBoundary; x < rightBoundary; x++) {
-            for (int y = bottomBoundary; y < topBoundary; y++) {
+        for (int x = leftBoundary - MinimumRoomGap; x < rightBoundary + MinimumRoomGap; x++) {
+            for (int y = bottomBoundary - MinimumRoomGap; y < topBoundary + MinimumRoomGap; y++) {
                 if (!IsValidForRoom(x, y)) {
                     return false; // Found overlap or out of bounds
                 }
@@ -120,13 +123,13 @@ public class World {
                 // Starting coordinates (n.getX(), n.getY()) can be dynamically adjusted or randomized
                 int xOffset = n.getX();
                 int yOffset = n.getY();
-                int width = rand.nextInt(Width / 3 - Width / 5) + Width / 5;
-                int height = rand.nextInt(Height / 3 - Height / 5) + Height / 5;
+                int width = rand.nextInt(Width / RoomSizeFactor - Width / (RoomSizeFactor + 2)) + Width / (RoomSizeFactor + 2);
+                int height = rand.nextInt(Height / RoomSizeFactor - Height / (RoomSizeFactor + 2)) + Height / (RoomSizeFactor + 2);
 
                 // Gradually adjust room size after failed attempts
                 if (attemptCount > 50) {
-                    width = rand.nextInt(Width / 4 - Width / 6) + Width / 6;
-                    height = rand.nextInt(Height / 4 - Height / 6) + Height / 6;
+                    width = width / 2;
+                    height = height / 2;
                 }
 
                 // Try spiral approach to place rooms
@@ -169,6 +172,7 @@ public class World {
                     System.out.println("original vertex" + vertexNumber);
                     vertex.set(vertexNumber, world[xOffset + roomWidth/2][yOffset + roomHeight/2]);
                     world[xOffset + roomWidth/2][yOffset + roomHeight/2].setTile(Tileset.FLOWER);
+                    world[xOffset + roomWidth/2][yOffset + roomHeight/2].setRoom();
                     return true;
                 }
             }
@@ -292,6 +296,7 @@ public class World {
         int avatarX = avatar.getX();
         int avatarY = avatar.getY();
         if (world[avatarX][avatarY + 1].isRoom()) {
+            System.out.println("moved up");
             swapNode(avatar, world[avatarX][avatarY + 1]);
         }
     }
@@ -325,8 +330,12 @@ public class World {
         int sourceY = source.getY();
         int targetX = target.getX();
         int targetY = target.getY();
+        // swap Node in each coordinate only affect its current coordinate in array but not node object
         Node tmp = world[sourceX][sourceY];
         world[sourceX][sourceY] = world[targetX][targetY];
         world[targetX][targetY] = tmp;
+
+        world[sourceX][targetY].setPosition(sourceX, sourceY);
+        world[targetX][targetY].setPosition(targetX, targetY);
     }
 }

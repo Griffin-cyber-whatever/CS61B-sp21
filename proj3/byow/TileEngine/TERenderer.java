@@ -43,7 +43,6 @@ public class TERenderer {
 
         StdDraw.enableDoubleBuffering();
         StdDraw.show();
-        System.out.println("TERENDERER INITIALIZED");
     }
 
     /**
@@ -86,7 +85,7 @@ public class TERenderer {
      * @param world the 2D TETile[][] array to render
      */
     public void renderFrame(TETile[][] world) {
-        System.out.println("renderFrame");
+        System.out.println(TETile.toString(world));
         int numXTiles = world.length;
         int numYTiles = world[0].length;
         StdDraw.clear(new Color(0, 0, 0));

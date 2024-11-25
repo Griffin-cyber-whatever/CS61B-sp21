@@ -17,15 +17,15 @@ import java.awt.Color;
  */
 
 public class Tileset {
-    public static final TETile AVATAR = new TETile('@', Color.white, Color.black, "you","./Tree.png");
+    public static final TETile AVATAR = new TETile('@', Color.white, Color.black, "you","byow/TileEngine/Tree.png");
     public static final TETile WALL = new TETile('#', new Color(216, 128, 128), Color.darkGray,
-            "wall","./Tree.png");
+            "wall","byow/TileEngine/Tree.png");
     public static final TETile FLOOR = new TETile('·', new Color(128, 192, 128), Color.black,
-            "floor","./Grass2.png");
-    public static final TETile NOTHING = new TETile(' ', Color.black, Color.black, "nothing","./Dirt.png");
-    public static final TETile GRASS = new TETile('"', Color.green, Color.black, "grass","./Tree.png");
-    public static final TETile WATER = new TETile('≈', Color.blue, Color.black, "water","./Tree.png");
-    public static final TETile FLOWER = new TETile('❀', Color.magenta, Color.pink, "flower");
+            "floor","byow/TileEngine/Grass2.png");
+    public static final TETile NOTHING = new TETile(' ', Color.black, Color.black, "nothing","byow/TileEngine/Dirt.png");
+    public static final TETile GRASS = new TETile('"', Color.green, Color.black, "grass","byow/TileEngine/Tree.png");
+    public static final TETile WATER = new TETile('≈', Color.blue, Color.black, "water","byow/TileEngine/Tree.png");
+    public static final TETile FLOWER = new TETile('❀', Color.magenta, Color.pink, "byow/TileEngine/Tree.png");
     public static final TETile LOCKED_DOOR = new TETile('█', Color.orange, Color.black,
             "locked door","./Tree.png");
     public static final TETile UNLOCKED_DOOR = new TETile('▢', Color.orange, Color.black,

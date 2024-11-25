@@ -1,6 +1,8 @@
 package byow;
 
 import byow.TileEngine.TERenderer;
+import byow.TileEngine.TETile;
+import byow.TileEngine.Tileset;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;
@@ -32,23 +34,24 @@ public class Render {
     public void renderGame(){
         drawMenu();
         while (!quit) {
-            String tmp;
+            String userInput;
             while (true){
                 if (StdDraw.hasNextKeyTyped()) {
-                    tmp = String.valueOf(StdDraw.nextKeyTyped());
+                    userInput = String.valueOf(StdDraw.nextKeyTyped());
                     break;
                 }
             }
+            System.out.println(userInput);
             // menu
             if (menu){
-                switch (tmp) {
+                switch (userInput) {
                     case "q" -> quit = true;
                     case "n" -> drawPrompt();
                     case "l" -> {
                     }
                 }
             } else {
-                switch (tmp) {
+                switch (userInput) {
                     case "w" -> {
                         world.moveUp();
                         RenderWorld();
@@ -79,6 +82,7 @@ public class Render {
         RenderWorld();
     }
 
+
     private void RenderWorld(){
         System.out.println("rendering world");
         renderer.renderFrame(world.getWorld());
@@ -91,8 +95,8 @@ public class Render {
             if (StdDraw.hasNextKeyTyped()) {
                 String tmp = String.valueOf(StdDraw.nextKeyTyped());
                 if (tmp.equals("S") || tmp.equals("s")) {
-                    // initializing world after receiving the entire seed
                     initializingWorld(Long.valueOf(sb.toString()));
+                    break;
                 } else {
                     sb.append(tmp);
                 }

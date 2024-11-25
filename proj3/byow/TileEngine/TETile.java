@@ -1,6 +1,7 @@
 package byow.TileEngine;
 
 import java.awt.Color;
+import java.io.File;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -89,7 +90,6 @@ public class TETile {
             } catch (IllegalArgumentException e) {
                 // Exception happens because the file can't be found. In this case, fail silently
                 // and just use the character and background color for the tile.
-                System.out.println("exception");
             }
         }
 
