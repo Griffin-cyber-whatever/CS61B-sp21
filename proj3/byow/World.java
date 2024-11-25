@@ -93,13 +93,9 @@ public class World implements Serializable {
         }
     }
 
-    private boolean IsValidForRoom(int x, int y) {
-        return x > 0 && x < world.length -1  && y > 0 && y < world[0].length -1 && world[x][y].getTile() == Tileset.NOTHING;
-    }
-
     // save current object in that
     public void save(){
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(savesAddress))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(saveFile))) {
             oos.writeObject(this);
         } catch (IOException e) {
             e.printStackTrace();
@@ -138,6 +134,9 @@ public class World implements Serializable {
         }
     }
 
+    private boolean IsValidForRoom(int x, int y) {
+        return x > 0 && x < world.length -1  && y > 0 && y < world[0].length -1 && world[x][y].getTile() == Tileset.NOTHING;
+    }
 
     private boolean IsWallValid(int x, int y) {
         if (x < 0 || x >= world.length || y < 0 || y >= world[0].length || world[x][y].getTile() != Tileset.NOTHING){
@@ -252,7 +251,6 @@ public class World implements Serializable {
                     CreateRoom(xOffset, yOffset, roomWidth, roomHeight);
                     System.out.println("original vertex" + vertexNumber);
                     vertex.set(vertexNumber, world[xOffset + roomWidth/2][yOffset + roomHeight/2]);
-                    world[xOffset + roomWidth/2][yOffset + roomHeight/2].setTile(Tileset.FLOWER);
                     world[xOffset + roomWidth/2][yOffset + roomHeight/2].setRoom();
                     return true;
                 }

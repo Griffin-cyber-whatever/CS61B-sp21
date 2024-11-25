@@ -1,8 +1,9 @@
 package byow;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Edge implements Comparable<Edge> {
+public class Edge implements Comparable<Edge>, Serializable {
     private int source;
     private int target;
     private double weight;

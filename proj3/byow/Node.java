@@ -2,7 +2,9 @@ package byow;
 
 import byow.TileEngine.TETile;
 
-public class Node {
+import java.io.Serializable;
+
+public class Node implements Serializable {
     private TETile tile;
     private int x;
     private int y;
