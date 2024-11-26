@@ -52,4 +52,8 @@ public class Node implements Serializable {
         int OtherY = n.getY();
         return Math.sqrt(Math.pow(OtherX - x, 2) + Math.pow(OtherY - y, 2));
     }
+
+    public String toString() {
+        return x + " " + y;
+    }
 }

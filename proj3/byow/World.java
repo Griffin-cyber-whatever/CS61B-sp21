@@ -23,6 +23,7 @@ public class World implements Serializable {
     private String fileName;
 
     private final Node[][] world;
+    private final long seed;
     private final Random rand;
     private final int Width;
     private final int Height;
@@ -37,10 +38,12 @@ public class World implements Serializable {
     // the minimum gap between each rooms
     private final int MinimumRoomGap = 3;
 
+
     // use this constructor when u already find out the seed
     public World(int width, int height, long seed) {
         this.Width = width;
         this.Height = height;
+        this.seed = seed;
         this.rand = new Random(seed);
         world = new Node[width][height];
         for (int x = 0; x < width; x++) {
@@ -365,6 +368,7 @@ public class World implements Serializable {
     // generate paths to connect all the rooms
     private void generatePaths(ArrayList<Edge> edges) {
         for (Edge edge : edges) {
+            System.out.println(edge);
             Node sourceNode = vertex.get(edge.getSource());
             Node targetNode = vertex.get(edge.getTarget());
             connectRooms(sourceNode, targetNode);
@@ -377,39 +381,39 @@ public class World implements Serializable {
         int targetX = target.getX();
         int targetY = target.getY();
 
-        int smallerX = Math.min(sourceX, targetX);
-        int smallerY = Math.min(sourceY, targetY);
-        int biggerX = Math.max(sourceX, targetX);
-        int biggerY = Math.max(sourceY, targetY);
-
-        // two vertexes in the same horizontal line
+        // two vertexes in the same vertical line
         if (sourceX == targetX) {
-            connectHorizontally(smallerX, sourceY, biggerX);
+            connectVertically(sourceX, sourceY, targetY);
         } else if (sourceY == targetY) {
             // two vertexes in the same vertical line
-            connectVertically(sourceX, smallerY, biggerY);
+            connectHorizontally(sourceX, sourceY, targetX);
         } else {
-            connectHorizontally(smallerX, smallerY, biggerX);
-            connectVertically(biggerX, smallerY, biggerY);
+            connectHorizontally(sourceX, sourceY, targetX);
+            connectVertically(targetX, sourceY, targetY);
         }
     }
 
     // we have already ensured that there is no overlap room in the previous method, so we can just connect them directly
     private void connectHorizontally(int sourceX, int sourceY, int targetX) {
-        for (int x = sourceX; x <= targetX; x++) {
-            if (IsValidForRoom(x, sourceY)) {
-                world[x][sourceY].setTile(Tileset.FLOOR);
-                world[x][sourceY].setRoom();
-            }
+        int tmp = sourceX;
+        sourceX = Math.min(sourceX, targetX);
+        targetX = Math.max(targetX, tmp);
+        System.out.println(String.format("connect Horizontally from %d to %d in x and %d in y", sourceX, targetX, sourceY));
+        for (int x = sourceX ; x <= targetX; x++) {
+            world[x][sourceY].setTile(Tileset.FLOOR); // Overwrite any tile in the path
+            world[x][sourceY].setRoom(); // Mark it as a room
         }
     }
 
+
     private void connectVertically(int sourceX, int sourceY, int targetY) {
+        int tmp = sourceY;
+        sourceY = Math.min(sourceY, targetY);
+        targetY = Math.max(targetY, tmp);
+        System.out.println(String.format("connect Vertically from %d to %d in y and %d in x", sourceY, targetY, sourceX));
         for (int y = sourceY; y <= targetY; y++) {
-            if (IsValidForRoom(sourceX, y)) {
                 world[sourceX][y].setTile(Tileset.FLOOR);
                 world[sourceX][y].setRoom();
-            }
         }
     }
 
