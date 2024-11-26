@@ -38,7 +38,6 @@ public class Render {
         while (!quit) {
             String userInput = nextNTypedKey(1);
 
-            System.out.println(userInput);
             drawMovement(userInput);
             if (controlMode && userInput.equals("q")) {
                 world.save();
@@ -195,13 +194,19 @@ public class Render {
         StdDraw.setPenColor(52, 178, 228);
         StdDraw.text(midX, startY, "New Game (N)");
 
+        // rendering seed
+        Font seedFont = new Font("Monaco", Font.CENTER_BASELINE, 25);
+        StdDraw.setFont(seedFont);
         startY -= spacing;
         StdDraw.setPenColor(52, 178, 228);
         StdDraw.text(midX, startY, "Seed: " + inputSeed);
 
+        Font seedFont2 = new Font("Monaco", Font.CENTER_BASELINE, 15);
+        StdDraw.setFont(seedFont2);
         startY -= spacing;
         StdDraw.text(midX, startY, "Press (S) to confirm");
 
+        StdDraw.setFont(menuFont);
         startY -= spacing;
         StdDraw.setPenColor(139, 16, 62);
         StdDraw.text(midX, startY, "Load Game (L)");
@@ -212,7 +217,7 @@ public class Render {
 
         StdDraw.show();
 
-        StdDraw.pause(50);
+        StdDraw.pause(10);
     }
 
     // add error message at the bottom of the screen

@@ -312,7 +312,6 @@ public class World implements Serializable {
                 // Check if this area is valid for room placement
                 if (IsRoomValid(xOffset, yOffset, roomWidth, roomHeight)) {
                     CreateRoom(xOffset, yOffset, roomWidth, roomHeight);
-                    System.out.println("original vertex" + vertexNumber);
                     vertex.set(vertexNumber, world[xOffset + roomWidth/2][yOffset + roomHeight/2]);
                     world[xOffset + roomWidth/2][yOffset + roomHeight/2].setRoom();
                     return true;
@@ -390,8 +389,8 @@ public class World implements Serializable {
             // two vertexes in the same vertical line
             connectVertically(sourceX, smallerY, biggerY);
         } else {
-            connectHorizontally(smallerX, sourceY, biggerX);
-            connectVertically(targetX, smallerY, biggerY);
+            connectHorizontally(smallerX, smallerY, biggerX);
+            connectVertically(biggerX, smallerY, biggerY);
         }
     }
 
@@ -471,8 +470,6 @@ public class World implements Serializable {
         int sourceY = source.getY();
         int targetX = target.getX();
         int targetY = target.getY();
-        System.out.println("source Node " + world[sourceX][sourceY] + " sourceX: " + sourceX + " sourceY: " + sourceY);
-        System.out.println("Target Node " + world[targetX][targetY] + " targetX: " + targetX + " targetY: " + targetY);
         // swap Node in each coordinate only affect its current coordinate in array but not node object
         Node tmp = world[sourceX][sourceY];
         world[sourceX][sourceY] = world[targetX][targetY];
@@ -480,8 +477,6 @@ public class World implements Serializable {
 
         target.setPosition(sourceX, sourceY);
         source.setPosition(targetX, targetY);
-        System.out.println(world[sourceX][sourceY] + "sourceX1: " + source.getX() + " sourceY1: " + source.getY());
-        System.out.println(world[targetX][targetY] + " targetX1: " + target.getX() + " targetY1: " + target.getY());
     }
 
 }

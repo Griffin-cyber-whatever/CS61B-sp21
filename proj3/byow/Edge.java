@@ -27,4 +27,8 @@ public class Edge implements Comparable<Edge>, Serializable {
     public int getTarget() {
         return target;
     }
+
+    public String toString() {
+        return "(" + source + ", " + target + ")";
+    }
 }
