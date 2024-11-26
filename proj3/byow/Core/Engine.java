@@ -51,12 +51,8 @@ public class Engine {
         //
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
-        if (!(input.startsWith("N") || input.startsWith("n")) || !(input.endsWith("s") || input.endsWith("S"))) {
-            System.out.println("Invalid input");
-            return null;
-        }
 
-        World w = new World(WIDTH, HEIGHT, (long) input.hashCode());
+        World w = World.seedProcessor(WIDTH, HEIGHT, input);
         this.world = w.getWorld();
         return world;
     }

@@ -40,11 +40,8 @@ public class Render {
 
             System.out.println(userInput);
             drawMovement(userInput);
-
-            if (controlMode && (userInput.equals("q") || userInput.equals("Q"))) {
+            if (controlMode && userInput.equals("q")) {
                 world.save();
-                //TODO read specification
-                System.out.println("dwadwa ");
                 menu = true;
                 controlMode = false;
                 drawMenu();
@@ -71,6 +68,9 @@ public class Render {
                             drawError(e.getMessage());
                             continue;
                         }
+                    }
+                    default -> {
+                        drawMenu();
                     }
                 }
             } else {
@@ -112,7 +112,7 @@ public class Render {
                 counter ++;
             }
         }
-        return sb.toString();
+        return sb.toString().toLowerCase();
     }
     private void initializingWorld(World world){
         StdDraw.clear(StdDraw.GRAY);
@@ -125,19 +125,20 @@ public class Render {
 
 
     private void RenderWorld(){
-        System.out.println("rendering world");
         renderer.renderFrame(world.getWorld());
     }
 
+    // can only type plain seed number in that mode
     private void drawPrompt(){
         StringBuilder sb = new StringBuilder();
         while(true){
             drawSeedPrompt(sb.toString());
             if (StdDraw.hasNextKeyTyped()) {
                 String tmp = String.valueOf(StdDraw.nextKeyTyped());
+                drawMovement(tmp);
                 if (tmp.equals("S") || tmp.equals("s")) {
-                    // TODO need to prove, long just plain parsing
-                    World worldWithTypedSeed = new World(Width, Height, Long.valueOf(sb.toString()));
+                    long seed = Long.parseLong(sb.toString());
+                    World worldWithTypedSeed = new World(Width, Height, seed);
                     initializingWorld(worldWithTypedSeed);
                     break;
                 } else {
@@ -210,6 +211,8 @@ public class Render {
         StdDraw.text(midX, startY, "Quit (Q)");
 
         StdDraw.show();
+
+        StdDraw.pause(50);
     }
 
     // add error message at the bottom of the screen
@@ -227,7 +230,9 @@ public class Render {
         StdDraw.setFont(Errorfont);
         StdDraw.setPenRadius(0.005);
         StdDraw.setPenColor(77, 170, 131);
-        StdDraw.textLeft(2,2, movement);
+        StdDraw.textLeft(2,2, movement.toUpperCase());
         StdDraw.show();
+
+        StdDraw.pause(100);
     }
 }

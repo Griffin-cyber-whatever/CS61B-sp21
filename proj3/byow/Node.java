@@ -37,6 +37,7 @@ public class Node implements Serializable {
     public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
+        System.out.println(this.x + " " + this.y + " " + this);
     }
 
     public boolean isRoom() {

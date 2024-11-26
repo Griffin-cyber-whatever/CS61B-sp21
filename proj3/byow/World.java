@@ -8,6 +8,8 @@ import java.io.*;
 import java.nio.file.FileAlreadyExistsException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /* my solution:
 *   using seed to generate node for world, each node would be a room
@@ -17,16 +19,17 @@ public class World implements Serializable {
     // saves location
     public static final File CWD = new File(System.getProperty("user.dir"));
     public static final File savesAddress = new File(CWD, "saves");
-    private File saveFile;
+    private final File saveFile;
     private String fileName;
 
-    private Node[][] world;
-    private Random rand;
-    private int Width;
-    private int Height;
-    private ArrayList<Node> vertex;
+    private final Node[][] world;
+    private final Random rand;
+    private final int Width;
+    private final int Height;
+    private final ArrayList<Node> vertex;
     // set avatar position with one of vertex
-    private Node avatar;
+    private final Node avatar;
+
     // set this would change the num of rooms
     private final double CoverageFactor = 0.5;
     // set this would change the ratio between room size and total map
@@ -34,6 +37,7 @@ public class World implements Serializable {
     // the minimum gap between each rooms
     private final int MinimumRoomGap = 3;
 
+    // use this constructor when u already find out the seed
     public World(int width, int height, long seed) {
         this.Width = width;
         this.Height = height;
@@ -63,14 +67,8 @@ public class World implements Serializable {
         avatar.setTile(Tileset.AVATAR);
 
         // initializing save of current object
-        savesInitializing();
-    }
-
-    private void savesInitializing(){
         this.fileName = currentTime();
         this.saveFile = new File(savesAddress, fileName);
-
-        FileSetupChecking();
     }
 
     private String currentTime(){
@@ -95,6 +93,7 @@ public class World implements Serializable {
 
     // save current object in that
     public void save(){
+        FileSetupChecking();
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(saveFile))) {
             oos.writeObject(this);
         } catch (IOException e) {
@@ -131,6 +130,70 @@ public class World implements Serializable {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             throw new IllegalStateException("Failed to load the save file.", e);
+        }
+    }
+
+    public static World seedProcessor(int Width, int Height, String seed) {
+            seed = seed.toLowerCase();
+
+            String number = "n+(\\d+)s";
+            String movement = "([swad]*)";
+            String save = "(:q)?$";
+            String regex = "^" + number + movement + save + "|(l)" + movement + save ;
+            Pattern pattern = Pattern.compile(regex);
+
+            Matcher matcher = pattern.matcher(seed);
+
+            if (matcher.matches()) {
+                String first = null;
+                String movementCommands = null;
+                String quitCommands = null;
+
+                if (matcher.group(1) != null) {
+                    // Matched the first alternative
+                    first = matcher.group(1); // Group 1: number
+                    movementCommands = matcher.group(2); // Group 2: movement commands
+                    quitCommands = matcher.group(3); // Group 3: save command
+                } else if (matcher.group(4) != null) {
+                    // Matched the second alternative
+                    first = matcher.group(4); // Group 4: "l"
+                    movementCommands = matcher.group(5); // Group 5: movement commands
+                    quitCommands = matcher.group(6); // Group 6: save command
+                }
+
+                return seedProcessorHelper(first, movementCommands, quitCommands, Width, Height);
+            } else {
+                throw new IllegalArgumentException("Seed does not match regex.");
+            }
+    }
+
+
+    private static World seedProcessorHelper(String first, String movementCommands, String quitCommands, int Width, int Height) {
+            try {
+            World world;
+            if (first.equals("l")){
+                world = load();
+            } else {
+                long seed = Long.parseLong(first);
+                world = new World(Width, Height, seed);
+            }
+
+            for (char c : movementCommands.toCharArray()) {
+                switch (c){
+                    case 'w' -> world.moveUp();
+                    case 's' -> world.moveDown();
+                    case 'a' -> world.moveLeft();
+                    case 'd' -> world.moveRight();
+                }
+            }
+
+            if (quitCommands != null &&  quitCommands.equals(":q")){
+                world.save();
+            }
+
+            return world;
+            } catch (Exception e){
+           throw new IllegalArgumentException("invalid seed");
         }
     }
 
@@ -375,7 +438,6 @@ public class World implements Serializable {
         int avatarX = avatar.getX();
         int avatarY = avatar.getY();
         if (world[avatarX][avatarY + 1].isRoom()) {
-            System.out.println("moved up");
             swapNode(avatar, world[avatarX][avatarY + 1]);
         }
     }
@@ -409,13 +471,17 @@ public class World implements Serializable {
         int sourceY = source.getY();
         int targetX = target.getX();
         int targetY = target.getY();
+        System.out.println("source Node " + world[sourceX][sourceY] + " sourceX: " + sourceX + " sourceY: " + sourceY);
+        System.out.println("Target Node " + world[targetX][targetY] + " targetX: " + targetX + " targetY: " + targetY);
         // swap Node in each coordinate only affect its current coordinate in array but not node object
         Node tmp = world[sourceX][sourceY];
         world[sourceX][sourceY] = world[targetX][targetY];
         world[targetX][targetY] = tmp;
 
-        world[sourceX][targetY].setPosition(sourceX, sourceY);
-        world[targetX][targetY].setPosition(targetX, targetY);
+        target.setPosition(sourceX, sourceY);
+        source.setPosition(targetX, targetY);
+        System.out.println(world[sourceX][sourceY] + "sourceX1: " + source.getX() + " sourceY1: " + source.getY());
+        System.out.println(world[targetX][targetY] + " targetX1: " + target.getX() + " targetY1: " + target.getY());
     }
 
 }
