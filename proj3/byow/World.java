@@ -398,7 +398,6 @@ public class World implements Serializable {
         int tmp = sourceX;
         sourceX = Math.min(sourceX, targetX);
         targetX = Math.max(targetX, tmp);
-        System.out.println(String.format("connect Horizontally from %d to %d in x and %d in y", sourceX, targetX, sourceY));
         for (int x = sourceX ; x <= targetX; x++) {
             world[x][sourceY].setTile(Tileset.FLOOR); // Overwrite any tile in the path
             world[x][sourceY].setRoom(); // Mark it as a room
@@ -410,7 +409,6 @@ public class World implements Serializable {
         int tmp = sourceY;
         sourceY = Math.min(sourceY, targetY);
         targetY = Math.max(targetY, tmp);
-        System.out.println(String.format("connect Vertically from %d to %d in y and %d in x", sourceY, targetY, sourceX));
         for (int y = sourceY; y <= targetY; y++) {
                 world[sourceX][y].setTile(Tileset.FLOOR);
                 world[sourceX][y].setRoom();

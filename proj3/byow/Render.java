@@ -56,7 +56,6 @@ public class Render {
                             drawPrompt();
                         } catch (Exception e) {
                             drawError(e.getMessage());
-                            continue;
                         }
                     }
                     case "l" -> {
@@ -65,7 +64,6 @@ public class Render {
                             initializingWorld(latestSave);
                         } catch (Exception e) {
                             drawError(e.getMessage());
-                            continue;
                         }
                     }
                     default -> {
